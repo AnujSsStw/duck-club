@@ -1,29 +1,31 @@
 import { v } from "convex/values";
-import {
-  action,
-  internalAction,
-  internalMutation,
-  mutation,
-} from "./_generated/server";
-import { getCurrentUserOrThrow } from "./users";
+import { Id } from "./_generated/dataModel";
+import { action, internalMutation, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 
-export const generateUploadUrl = mutation(async (ctx) => {
-  return await ctx.storage.generateUploadUrl();
+export const getSubHunts = query({
+  args: { id: v.id("hunts") },
+  handler: async (ctx, { id }) => {
+    const data = await ctx.db.get(id);
+    if (!data) return null;
+
+    const subHunts = await Promise.all(
+      data.subHunts.map((subHunt: Id<"subHunts">) => ctx.db.get(subHunt))
+    );
+
+    return subHunts;
+  },
 });
 
-export const logHunt = action({
+export const addHunt = action({
   args: {
-    startDate: v.string(),
-    huntLoaction: v.object({ lat: v.number(), lng: v.number() }), // {lat: "123", long: "123"}
-    hunterIDs: v.array(v.id("hunters")),
-    pictures: v.optional(v.array(v.string())),
-    species: v.array(v.object({ name: v.string(), count: v.number() })),
+    date: v.string(),
+    creatorID: v.id("hunters"),
+    location: v.object({ lat: v.number(), lng: v.number() }),
   },
-  handler: async (ctx, args) => {
-    console.log("Hunt data submitted:", args);
+  handler: async (ctx, args): Promise<Id<"hunts">> => {
     const location = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${args.huntLoaction.lat},${args.huntLoaction.lng}&key=${process.env.GOOGLE_MAPS_API}`
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${args.location.lat},${args.location.lng}&key=${process.env.GOOGLE_MAPS_API}`
     );
     const location_data = await location.json();
     const locationId = await ctx.runMutation(
@@ -33,121 +35,56 @@ export const logHunt = action({
       }
     );
 
-    const weather = await fetch(
-      `http://api.weatherapi.com/v1/current.json?key=${process.env.WEATHER_API}&q=${args.huntLoaction.lat},${args.huntLoaction.lng}&aqi=no`
-    );
-    const weather_data = await weather.json();
-    const weatherId = await ctx.runMutation(internal.hunts.insertWeatherData, {
-      locationID: locationId,
-      Weather_data: weather_data,
-    });
+    const timeSlot = ["morning", "mid-day", "afternoon"];
+    const subHunts: Array<Id<"subHunts">> = [];
 
-    const huntId = await ctx.runMutation(internal.hunts.insertHuntData, {
-      endDate: args.endDate,
-      startDate: args.startDate,
-      locationID: locationId,
-      weatherID: weatherId,
-      pictures: args.pictures,
-      hunterIDs: args.hunterIDs,
-    });
-
-    for (const hunterId of args.hunterIDs) {
-      await ctx.scheduler.runAfter(0, internal.hunts.insertHunterHuntData, {
-        hunterID: hunterId,
-        huntID: huntId,
+    for (const slot of timeSlot) {
+      const id = await ctx.runMutation(internal.hunts.insertsubHuntData, {
+        timeSlot: slot,
+        locationID: locationId,
+        creatorID: args.creatorID,
+        date: args.date,
       });
+      subHunts.push(id);
     }
 
-    // for (const species of args.species) {
-    //   await ctx.runMutation(internal.hunts.insertSpeciesTakenData, {
-    //     name: species.name,
-    //     count: species.count,
-    //     huntId: huntId,
-    //   });
-    // }
-
-    return true;
-  },
-});
-
-// insert data into SpeciesTaken
-// export const insertSpeciesTakenData = internalMutation({
-//   args: {
-//     name: v.string(),
-//     count: v.number(),
-//     huntId: v.id("hunts"),
-//   },
-//   handler: async (ctx, data) => {
-//     return await ctx.db.insert("harvestDetails", {
-//       huntId: data.huntId,
-//       quantity: data.count,
-//       speciesId: data.name,
-//     });
-//   },
-// });
-
-// insert data into hunterHunt
-export const insertHunterHuntData = internalMutation({
-  args: {
-    hunterID: v.id("hunters"),
-    huntID: v.id("hunts"),
-  },
-  handler: async (ctx, data) => {
-    return await ctx.db.insert("huntersHunts", {
-      hunterID: data.hunterID,
-      huntID: data.huntID,
+    return ctx.runMutation(internal.hunts.insertHuntData, {
+      subHunts,
+      creatorID: args.creatorID,
     });
   },
 });
 
-// insert data into hunts
+// insert data into hunt
 export const insertHuntData = internalMutation({
   args: {
-    startDate: v.string(),
-    locationID: v.id("huntLocations"),
-    weatherID: v.id("weatherConditions"),
-    hunterIDs: v.array(v.id("hunters")),
-    pictures: v.optional(v.array(v.string())),
+    subHunts: v.array(v.id("subHunts")),
+    creatorID: v.id("hunters"),
   },
-  handler: async (ctx, data) => {
+  handler: async (ctx, args) => {
     return await ctx.db.insert("hunts", {
-      startDate: data.startDate,
-      locationID: data.locationID,
-      pictures: data.pictures,
-      hunterID: data.hunterIDs,
-      weatherConditionID: data.weatherID,
-      blindID: "1" as any,
-      totalWaterfowl: 0,
+      createdBy: args.creatorID,
+      subHunts: args.subHunts,
     });
   },
 });
 
-// insert data into weatherConditions
-export const insertWeatherData = internalMutation({
+//insert data into subHunt
+export const insertsubHuntData = internalMutation({
   args: {
-    Weather_data: v.any(),
+    timeSlot: v.string(),
     locationID: v.id("huntLocations"),
+    creatorID: v.id("hunters"),
+    date: v.string(),
   },
-  handler: async (ctx, { Weather_data, locationID }) => {
-    // console.log("Weather data:", args.data);
-    const extractedData = {
-      date: Weather_data.current.last_updated,
-      locationID: locationID, // Assuming a static ID; replace as needed
-      temperatureC: Weather_data.current.temp_c,
-      windDirection: Weather_data.current.wind_dir,
-      windSpeed: Weather_data.current.wind_kph,
-      precipitation:
-        Weather_data.current.precip_mm > 0
-          ? `${Weather_data.current.precip_mm} mm`
-          : "No precipitation",
-      condition: Weather_data.current.condition.text,
-      humidity: Weather_data.current.humidity,
-      visibility: Weather_data.current.vis_km,
-      uvIndex: Weather_data.current.uv,
-      source: "WeatherAPI", // Assuming source; replace as needed
-    };
-
-    return await ctx.db.insert("weatherConditions", extractedData);
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("subHunts", {
+      timeSlot: args.timeSlot as any,
+      locationID: args.locationID,
+      creatorId: args.creatorID,
+      date: args.date,
+      init: false,
+    });
   },
 });
 
@@ -161,7 +98,7 @@ export const insertLocationData = internalMutation({
   },
 });
 
-function extractLocationData(data: { results: any[] }) {
+export function extractLocationData(data: { results: any[] }) {
   // Find the result with the most detailed information
   const detailedResult = data.results.reduce(
     (

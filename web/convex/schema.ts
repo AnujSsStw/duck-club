@@ -50,14 +50,7 @@ export default defineSchema(
       source: v.string(),
     }),
 
-    hunts: defineTable({
-      timeSlot: v.optional(
-        v.union(
-          v.literal("morning"),
-          v.literal("mid-day"),
-          v.literal("afternoon")
-        )
-      ),
+    subHunts: defineTable({
       weatherConditionID: v.optional(v.id("weatherConditions")),
       hunterIDs: v.optional(v.array(v.id("hunters"))),
       pictures: v.optional(v.array(v.string())),
@@ -67,12 +60,19 @@ export default defineSchema(
       creatorId: v.id("hunters"),
       locationID: v.id("huntLocations"),
       date: v.string(),
+      timeSlot: v.union(
+        v.literal("morning"),
+        v.literal("mid-day"),
+        v.literal("afternoon")
+      ),
+      init: v.boolean(),
     }).index("by_date", ["date"]),
 
     huntersHunts: defineTable({
       hunterID: v.id("hunters"),
-      huntID: v.id("hunts"),
-      blindID: v.id("duckBlinds"),
+      huntID: v.id("subHunts"),
+      blindId: v.id("duckBlinds"),
+      speciesId: v.id("waterfowlSpecies"),
     }).index("by_hunterID", ["hunterID"]),
 
     waterfowlSpecies: defineTable({
@@ -81,10 +81,23 @@ export default defineSchema(
     }),
 
     harvestDetails: defineTable({
-      huntId: v.id("hunts"),
+      huntId: v.id("subHunts"),
       speciesId: v.id("waterfowlSpecies"),
       quantity: v.number(),
     }).index("by_huntId", ["huntId"]),
+
+    hunts: defineTable({
+      subHunts: v.array(v.id("subHunts")),
+      createdBy: v.id("hunters"),
+    }),
   },
   { schemaValidation: true }
 );
+
+/**
+ * in a one day hunt, there can be multiple sub hunts with different time slots like morning, mid-day, afternoon
+ *
+ * in a sub hunt, there can be multiple hunters, multiple blinds, multiple species taken
+ *
+ * we have to store each hunter blind and species taken in a separate table
+ */

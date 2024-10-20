@@ -32,7 +32,7 @@ export function CalendarForm({
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <FormLabel>{label} Date</FormLabel>
+          <FormLabel>{label}</FormLabel>
           <Popover>
             <PopoverTrigger asChild>
               <FormControl>

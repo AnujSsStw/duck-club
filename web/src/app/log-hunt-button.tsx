@@ -1,8 +1,6 @@
-import * as React from "react";
-
-import { cn } from "@/lib/utils";
-import { useMediaQuery } from "@/components/use-media-query";
+import MapComp from "@/components/map/map";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -21,13 +19,17 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Form } from "@/components/ui/form";
+import { useMediaQuery } from "@/components/use-media-query";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { PlusCircledIcon } from "@radix-ui/react-icons";
-import MapComp from "@/components/map/map";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { CalendarForm } from "./log-hunt/date-picker";
 
 export function LogHuntButton() {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop) {
@@ -39,7 +41,7 @@ export function LogHuntButton() {
             Log Hunt
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px] overflow-auto">
+        <DialogContent className="sm:max-w-[70%] overflow-y-scroll max-h-screen h-[80%]">
           <DialogHeader>
             <DialogTitle>Log Hunt</DialogTitle>
             <DialogDescription>
@@ -75,29 +77,53 @@ export function LogHuntButton() {
   );
 }
 
+const FormSchema = z.object({
+  date: z.date({ required_error: "Start date is required" }),
+  location: z.object({
+    lat: z.number(),
+    lng: z.number(),
+  }),
+});
+
 function ProfileForm({ className }: React.ComponentProps<"form">) {
-  async function handleCreateHunt(e: React.FormEvent) {
-    e.preventDefault();
-    const form = e.currentTarget as HTMLFormElement;
-    const formData = new FormData(form);
-    const email = formData.get("email") as string;
-    const username = formData.get("username") as string;
-  }
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      date: undefined,
+      location: { lat: 0, lng: 0 },
+    },
+  });
+
+  const onSubmit = async (data: z.infer<typeof FormSchema>) => {
+    console.log(data);
+  };
 
   return (
-    <form
-      onClick={handleCreateHunt}
-      className={cn("grid items-start gap-4", className)}
-    >
-      <div className="grid gap-2">
-        <Label htmlFor="location">Location</Label>
-        <MapComp />
-      </div>
-      <div className="grid gap-2">
-        <Label htmlFor="shift">Username</Label>
-        <Input id="username" defaultValue="@shadcn" />
-      </div>
-      <Button type="submit">Create Hunt</Button>
-    </form>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-6 flex flex-col justify-center"
+      >
+        <div className="grid gap-2">
+          <MapComp form={form} />
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Hunt Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* <MapComp form={form} /> */}
+
+            <div className="flex space-x-4">
+              <div className="flex-1">
+                <CalendarForm form={form} label="Date" name="date" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Button type="submit">Create Hunt</Button>
+      </form>
+    </Form>
   );
 }

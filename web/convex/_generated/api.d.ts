@@ -19,6 +19,7 @@ import type * as http from "../http.js";
 import type * as hunts from "../hunts.js";
 import type * as init from "../init.js";
 import type * as queries_species from "../queries/species.js";
+import type * as subHunts from "../subHunts.js";
 import type * as users from "../users.js";
 
 /**
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   hunts: typeof hunts;
   init: typeof init;
   "queries/species": typeof queries_species;
+  subHunts: typeof subHunts;
   users: typeof users;
 }>;
 export declare const api: FilterApi<
