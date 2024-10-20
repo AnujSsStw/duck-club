@@ -1,0 +1,286 @@
+{
+  "plus_code": {
+    "compound_code": "XR78+GM7 Maila Bagh, Rajasthan, India",
+    "global_code": "7JRQXR78+GM7"
+  },
+  "results": [
+    {
+      "address_components": [
+        {
+          "long_name": "XR78+GM",
+          "short_name": "XR78+GM",
+          "types": ["plus_code"]
+        },
+        {
+          "long_name": "Maila Bagh",
+          "short_name": "Maila Bagh",
+          "types": ["locality", "political"]
+        },
+        {
+          "long_name": "Jaipur",
+          "short_name": "Jaipur",
+          "types": ["administrative_area_level_3", "political"]
+        },
+        {
+          "long_name": "Jaipur Division",
+          "short_name": "Jaipur Division",
+          "types": ["administrative_area_level_2", "political"]
+        },
+        {
+          "long_name": "Rajasthan",
+          "short_name": "RJ",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "India",
+          "short_name": "IN",
+          "types": ["country", "political"]
+        },
+        {
+          "long_name": "302028",
+          "short_name": "302028",
+          "types": ["postal_code"]
+        }
+      ],
+      "formatted_address": "XR78+GM Maila Bagh, Rajasthan, India",
+      "geometry": {
+        "bounds": {
+          "northeast": { "lat": 26.963875, "lng": 75.81675 },
+          "southwest": { "lat": 26.96375, "lng": 75.816625 }
+        },
+        "location": { "lat": 26.9637847, "lng": 75.8166802 },
+        "location_type": "GEOMETRIC_CENTER",
+        "viewport": {
+          "northeast": { "lat": 26.9651614802915, "lng": 75.81803648029151 },
+          "southwest": { "lat": 26.9624635197085, "lng": 75.8153385197085 }
+        }
+      },
+      "place_id": "GhIJmuIWmLr2OkARm5IHfUT0UkA",
+      "plus_code": {
+        "compound_code": "XR78+GM Maila Bagh, Rajasthan, India",
+        "global_code": "7JRQXR78+GM"
+      },
+      "types": ["plus_code"]
+    },
+    {
+      "address_components": [
+        {
+          "long_name": "302028",
+          "short_name": "302028",
+          "types": ["postal_code"]
+        },
+        {
+          "long_name": "Kookas",
+          "short_name": "Kookas",
+          "types": ["locality", "political"]
+        },
+        {
+          "long_name": "Jaipur",
+          "short_name": "Jaipur",
+          "types": ["administrative_area_level_3", "political"]
+        },
+        {
+          "long_name": "Jaipur Division",
+          "short_name": "Jaipur Division",
+          "types": ["administrative_area_level_2", "political"]
+        },
+        {
+          "long_name": "Rajasthan",
+          "short_name": "RJ",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "India",
+          "short_name": "IN",
+          "types": ["country", "political"]
+        }
+      ],
+      "formatted_address": "Kookas, Rajasthan 302028, India",
+      "geometry": {
+        "bounds": {
+          "northeast": { "lat": 27.100911, "lng": 75.9713999 },
+          "southwest": { "lat": 26.9476085, "lng": 75.7871004 }
+        },
+        "location": { "lat": 27.0319414, "lng": 75.8882508 },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": { "lat": 27.100911, "lng": 75.9713999 },
+          "southwest": { "lat": 26.9476085, "lng": 75.7871004 }
+        }
+      },
+      "place_id": "ChIJB8xG2eCvbTkRIKvw_jhxdFU",
+      "types": ["postal_code"]
+    },
+    {
+      "address_components": [
+        {
+          "long_name": "Jaipur",
+          "short_name": "Jaipur",
+          "types": ["administrative_area_level_4", "political"]
+        },
+        {
+          "long_name": "Jaipur",
+          "short_name": "Jaipur",
+          "types": ["administrative_area_level_3", "political"]
+        },
+        {
+          "long_name": "Jaipur Division",
+          "short_name": "Jaipur Division",
+          "types": ["administrative_area_level_2", "political"]
+        },
+        {
+          "long_name": "Rajasthan",
+          "short_name": "RJ",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "India",
+          "short_name": "IN",
+          "types": ["country", "political"]
+        }
+      ],
+      "formatted_address": "Jaipur, Rajasthan, India",
+      "geometry": {
+        "bounds": {
+          "northeast": { "lat": 27.0158384, "lng": 75.93935379999999 },
+          "southwest": { "lat": 26.8486453, "lng": 75.5000076 }
+        },
+        "location": { "lat": 26.9268049, "lng": 75.8086258 },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": { "lat": 27.0158384, "lng": 75.93935379999999 },
+          "southwest": { "lat": 26.8486453, "lng": 75.5000076 }
+        }
+      },
+      "place_id": "ChIJJVhTJ0qzbTkRUzSCpqpP9zs",
+      "types": ["administrative_area_level_4", "political"]
+    },
+    {
+      "address_components": [
+        {
+          "long_name": "Jaipur",
+          "short_name": "Jaipur",
+          "types": ["administrative_area_level_3", "political"]
+        },
+        {
+          "long_name": "Jaipur Division",
+          "short_name": "Jaipur Division",
+          "types": ["administrative_area_level_2", "political"]
+        },
+        {
+          "long_name": "Rajasthan",
+          "short_name": "RJ",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "India",
+          "short_name": "IN",
+          "types": ["country", "political"]
+        }
+      ],
+      "formatted_address": "Jaipur, Rajasthan, India",
+      "geometry": {
+        "bounds": {
+          "northeast": { "lat": 27.8606612, "lng": 76.28747179999999 },
+          "southwest": { "lat": 26.4402584, "lng": 74.914346 }
+        },
+        "location": { "lat": 27.0216001, "lng": 75.89986739999999 },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": { "lat": 27.8606612, "lng": 76.28747179999999 },
+          "southwest": { "lat": 26.4402584, "lng": 74.914346 }
+        }
+      },
+      "place_id": "ChIJKf5VgBy0bTkRHPupZ20H8oQ",
+      "types": ["administrative_area_level_3", "political"]
+    },
+    {
+      "address_components": [
+        {
+          "long_name": "Jaipur Division",
+          "short_name": "Jaipur Division",
+          "types": ["administrative_area_level_2", "political"]
+        },
+        {
+          "long_name": "Rajasthan",
+          "short_name": "RJ",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "India",
+          "short_name": "IN",
+          "types": ["country", "political"]
+        }
+      ],
+      "formatted_address": "Jaipur Division, Rajasthan, India",
+      "geometry": {
+        "bounds": {
+          "northeast": { "lat": 28.5181964, "lng": 77.210751 },
+          "southwest": { "lat": 26.3787415, "lng": 74.6805657 }
+        },
+        "location": { "lat": 27.3900302, "lng": 75.89986739999999 },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": { "lat": 28.5181964, "lng": 77.210751 },
+          "southwest": { "lat": 26.3787415, "lng": 74.6805657 }
+        }
+      },
+      "place_id": "ChIJieYbTYZMbDkRc51tGe4e2Ws",
+      "types": ["administrative_area_level_2", "political"]
+    },
+    {
+      "address_components": [
+        {
+          "long_name": "Rajasthan",
+          "short_name": "RJ",
+          "types": ["administrative_area_level_1", "political"]
+        },
+        {
+          "long_name": "India",
+          "short_name": "IN",
+          "types": ["country", "political"]
+        }
+      ],
+      "formatted_address": "Rajasthan, India",
+      "geometry": {
+        "bounds": {
+          "northeast": { "lat": 30.1981547, "lng": 78.2722574 },
+          "southwest": { "lat": 23.0586612, "lng": 69.4844368 }
+        },
+        "location": { "lat": 27.0238036, "lng": 74.21793260000001 },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": { "lat": 30.1981547, "lng": 78.2722574 },
+          "southwest": { "lat": 23.0586612, "lng": 69.4844368 }
+        }
+      },
+      "place_id": "ChIJNw7j9_o-ajkR5YjABkWbK7U",
+      "types": ["administrative_area_level_1", "political"]
+    },
+    {
+      "address_components": [
+        {
+          "long_name": "India",
+          "short_name": "IN",
+          "types": ["country", "political"]
+        }
+      ],
+      "formatted_address": "India",
+      "geometry": {
+        "bounds": {
+          "northeast": { "lat": 35.6733149, "lng": 97.39535869999999 },
+          "southwest": { "lat": 6.4626999, "lng": 68.1097 }
+        },
+        "location": { "lat": 20.593684, "lng": 78.96288 },
+        "location_type": "APPROXIMATE",
+        "viewport": {
+          "northeast": { "lat": 35.6733149, "lng": 97.39535869999999 },
+          "southwest": { "lat": 6.4626999, "lng": 68.1097 }
+        }
+      },
+      "place_id": "ChIJkbeSa_BfYzARphNChaFPjNc",
+      "types": ["country", "political"]
+    }
+  ],
+  "status": "OK"
+}
