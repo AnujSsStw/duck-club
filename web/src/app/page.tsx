@@ -5,7 +5,7 @@ import { Link } from "@/components/typography/link";
 import { Button } from "@/components/ui/button";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated } from "convex/react";
-import { LogHuntButton } from "./log-hunt-button";
+import { LogHuntButton } from "./log/[hunt]/[sub-hunt]/log-hunt-button";
 
 export default function Home() {
   return (

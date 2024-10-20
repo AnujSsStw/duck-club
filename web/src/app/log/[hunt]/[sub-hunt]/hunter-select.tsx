@@ -5,6 +5,14 @@ import { useDebounce } from "use-debounce";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search, UserPlus, X } from "lucide-react";
+import { useFieldArray, UseFormReturn } from "react-hook-form";
+import { FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { species } from "@/lib/constants";
+import { BlindsManager } from "@/app/log-hunt/blinds-picker";
+import {
+  SpeciesFieldArray,
+  WaterFlow,
+} from "@/app/log-hunt/waterfowlSpecies-picker";
 
 // Simulated API call
 const fetchUsers = async (
@@ -30,17 +38,40 @@ const fetchUsers = async (
   );
 };
 
-export default function Component() {
+export function HunterSelect({
+  form,
+}: {
+  form: UseFormReturn<
+    {
+      hunters: {
+        hunterID: string;
+        name: string;
+        email: string;
+        species: {
+          name: string;
+          count: number;
+        }[];
+        blinds: {
+          name: string;
+        };
+      }[];
+    },
+    any,
+    undefined
+  >;
+}) {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
   const [searchResults, setSearchResults] = useState<
-    Array<{ id: number; name: string; email: string }>
-  >([]);
-  const [selectedUsers, setSelectedUsers] = useState<
-    Array<{ id: number; name: string; email: string }>
+    Array<{ id: string; name: string; email: string }>
   >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "hunters",
+  });
 
   const performSearch = useCallback(async (query: string) => {
     if (query.trim() === "") {
@@ -52,7 +83,9 @@ export default function Component() {
     setError(null);
     try {
       const results = await fetchUsers(query);
-      setSearchResults(results);
+      setSearchResults(
+        results.map((user) => ({ ...user, id: user.id.toString() }))
+      );
     } catch (err) {
       setError("Failed to fetch users. Please try again.");
       setSearchResults([]);
@@ -65,14 +98,20 @@ export default function Component() {
     performSearch(debouncedSearchTerm);
   }, [debouncedSearchTerm, performSearch]);
 
-  const handleAddUser = (user: { id: number; name: string; email: string }) => {
-    if (!selectedUsers.some((selectedUser) => selectedUser.id === user.id)) {
-      setSelectedUsers([...selectedUsers, user]);
+  const handleAddUser = (user: { id: string; name: string; email: string }) => {
+    if (!fields.some((field) => field.hunterID === user.id)) {
+      append({
+        email: user.email,
+        name: user.name,
+        blinds: { name: "" },
+        species: [{ name: "", count: 0 }],
+        hunterID: user.id,
+      });
     }
   };
 
-  const handleRemoveUser = (userId: number) => {
-    setSelectedUsers(selectedUsers.filter((user) => user.id !== userId));
+  const handleRemoveUser = (index: number) => {
+    remove(index);
   };
 
   return (
@@ -118,9 +157,7 @@ export default function Component() {
                 </div>
                 <Button
                   onClick={() => handleAddUser(user)}
-                  disabled={selectedUsers.some(
-                    (selectedUser) => selectedUser.id === user.id
-                  )}
+                  disabled={fields.some((field) => field.hunterID === user.id)}
                 >
                   <UserPlus className="mr-2 h-4 w-4" />
                   Add
@@ -133,36 +170,56 @@ export default function Component() {
 
       <div>
         <h2 className="text-lg font-semibold mb-2">Selected Users</h2>
-        {selectedUsers.length === 0 ? (
+        {fields.length === 0 ? (
           <p className="text-gray-500">No users selected</p>
         ) : (
-          <ul className="space-y-2">
-            {selectedUsers.map((user) => (
+          <ul className="space-y-4 ">
+            {fields.map((field, index) => (
               <li
-                key={user.id}
-                className="flex items-center justify-between p-3 rounded-lg shadow"
+                key={field.id}
+                className="border-white border  my-4 flex flex-col p-3 rounded-lg shadow"
               >
-                <div>
-                  <p className="font-medium">{user.name}</p>
-                  <p className="text-sm text-gray-500">{user.email}</p>
-                </div>
-
-                <div>
-                  {blindFields.map((field, index) => (
-                    <BlindsManager
-                      field={field}
-                      index={index}
-                      remove={removeBlind}
-                      form={form}
+                {/* basic details */}
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name={`hunters.${index}.name`}
+                      render={({ field }) => (
+                        <p className="font-medium">{field.value}</p>
+                      )}
                     />
-                  ))}
+                    <FormField
+                      control={form.control}
+                      name={`hunters.${index}.email`}
+                      render={({ field }) => (
+                        <p className="text-sm text-gray-500">{field.value}</p>
+                      )}
+                    />
+                  </div>
+
                   <Button
                     variant="ghost"
-                    onClick={() => handleRemoveUser(user.id)}
+                    onClick={() => handleRemoveUser(index)}
                   >
                     <X className="h-4 w-4" />
                     <span className="sr-only">Remove user</span>
                   </Button>
+                </div>
+
+                {/* blinds */}
+                <div>
+                  <BlindsManager
+                    field={field}
+                    index={index}
+                    remove={remove}
+                    form={form}
+                  />
+                </div>
+
+                {/* species */}
+                <div>
+                  <SpeciesFieldArray nestIndex={index} control={form.control} />
                 </div>
               </li>
             ))}

@@ -19,7 +19,7 @@ import { api } from "@/../convex/_generated/api";
 import { Id } from "@/../convex/_generated/dataModel";
 import { BlindsManager } from "./blinds-picker";
 import { CalendarForm } from "./date-picker";
-import MultiSelectSearch from "./hunter-select";
+// import MultiSelectSearch from "../log/[hunt]/[sub-hunt]/hunter-select";
 import { WaterFlow } from "./waterfowlSpecies-picker";
 
 const FormSchema = z.object({
@@ -138,26 +138,9 @@ export default function LogHunt() {
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Hunt Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* <MapComp form={form} /> */}
-
-              <div className="flex space-x-4">
-                <div className="flex-1">
-                  <CalendarForm form={form} label="Starting" name="startDate" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
               <CardTitle>Hunters</CardTitle>
             </CardHeader>
-            <CardContent>
-              <MultiSelectSearch />
-            </CardContent>
+            <CardContent>{/* <MultiSelectSearch /> */}</CardContent>
           </Card>
 
           <Card>

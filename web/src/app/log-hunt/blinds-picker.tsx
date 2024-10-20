@@ -43,7 +43,7 @@ export function BlindsManager({
       <div key={field.id} className="flex items-end space-x-2 mb-4">
         <FormField
           control={form.control}
-          name={`blinds.${index}.name`}
+          name={`hunters.${index}.blinds.name`}
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel>Blinds</FormLabel>
@@ -79,10 +79,13 @@ export function BlindsManager({
                             value={s.name}
                             key={s.name}
                             onSelect={() => {
-                              form.setValue(`blinds.${index}.name`, s.name);
+                              form.setValue(
+                                `hunters.${index}.blinds.name`,
+                                s.name
+                              );
                             }}
                           >
-                            {s.name}
+                            {s.alternativeName || s.name}
                             <CheckIcon
                               className={cn(
                                 "ml-auto h-4 w-4",
