@@ -1,5 +1,5 @@
-import { Code } from "@/src/components/typography/code";
-import { Link } from "@/src/components/typography/link";
+import { Code } from "@/components/typography/code";
+import { Link } from "@/components/typography/link";
 
 export default function Layouts() {
   return (

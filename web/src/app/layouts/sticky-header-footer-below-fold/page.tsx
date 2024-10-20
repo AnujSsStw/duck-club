@@ -1,7 +1,7 @@
-import { FakeParagraphs } from "@/src/components/helpers/FakeParagraphs";
-import { Footer } from "@/src/components/layout/footer";
-import { Paragraph } from "@/src/components/layout/paragraph";
-import { StickyHeader } from "@/src/components/layout/sticky-header";
+import { FakeParagraphs } from "@/components/helpers/FakeParagraphs";
+import { Footer } from "@/components/layout/footer";
+import { Paragraph } from "@/components/layout/paragraph";
+import { StickyHeader } from "@/components/layout/sticky-header";
 
 export default function Layout() {
   return (

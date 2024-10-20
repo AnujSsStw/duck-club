@@ -1,9 +1,9 @@
-import { FakeParagraphs } from "@/src/components/helpers/FakeParagraphs";
-import { FakeWordList } from "@/src/components/helpers/FakeWordList";
-import { Footer } from "@/src/components/layout/footer";
-import { Paragraph } from "@/src/components/layout/paragraph";
-import { StickyHeader } from "@/src/components/layout/sticky-header";
-import { StickySidebar } from "@/src/components/layout/sticky-sidebar";
+import { FakeParagraphs } from "@/components/helpers/FakeParagraphs";
+import { FakeWordList } from "@/components/helpers/FakeWordList";
+import { Footer } from "@/components/layout/footer";
+import { Paragraph } from "@/components/layout/paragraph";
+import { StickyHeader } from "@/components/layout/sticky-header";
+import { StickySidebar } from "@/components/layout/sticky-sidebar";
 
 export default function Layout() {
   return (

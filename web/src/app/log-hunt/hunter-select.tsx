@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useDebounce } from "use-debounce";
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Loader2, Search, UserPlus, X } from "lucide-react";
 
 // Simulated API call

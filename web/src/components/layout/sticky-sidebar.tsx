@@ -1,5 +1,5 @@
 import { cn, fr } from "@/lib/utils";
-import { ScrollArea } from "@/src/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const StickySidebar = fr(function StickySidebar(
   { className, children, ...props },

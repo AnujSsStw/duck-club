@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, ButtonProps } from "@/src/components/ui/button";
+import { Button, ButtonProps } from "@/components/ui/button";
 import { fr } from "@/lib/utils";
 import { Cross2Icon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 import { Slot } from "@radix-ui/react-slot";

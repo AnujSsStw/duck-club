@@ -1,5 +1,5 @@
-import { Code } from "@/src/components/typography/code";
-import { Link } from "@/src/components/typography/link";
+import { Code } from "@/components/typography/code";
+import { Link } from "@/components/typography/link";
 import { Component, ReactNode } from "react";
 
 // NOTE: Once you get Clerk working you can remove this error boundary

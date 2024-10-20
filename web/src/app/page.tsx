@@ -1,16 +1,10 @@
 "use client";
 
-import { StickyHeader } from "@/src/components/layout/sticky-header";
-import { Link } from "@/src/components/typography/link";
-import { Button } from "@/src/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/src/components/ui/tabs";
+import { StickyHeader } from "@/components/layout/sticky-header";
+import { Link } from "@/components/typography/link";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
-import { PlusCircledIcon } from "@radix-ui/react-icons";
 import { Separator } from "@radix-ui/react-select";
 import { Authenticated, Unauthenticated } from "convex/react";
 import { LogHuntButton } from "./log-hunt-button";
