@@ -45,8 +45,8 @@ export const species = [
 export const blinds = [
   { name: "1A", latitude: 0, longitude: 0 },
   { name: "1B", latitude: 0, longitude: 0 },
-  { name: "2", latitude: 0, longitude: 0, alternativeName: "Pit" },
-  { name: "3", latitude: 0, longitude: 0, alternativeName: "Double" },
+  { name: "Pit", latitude: 0, longitude: 0 },
+  { name: "Double", latitude: 0, longitude: 0 },
   { name: "4", latitude: 0, longitude: 0 },
   { name: "Treehouse", latitude: 0, longitude: 0 },
 ];

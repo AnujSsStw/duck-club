@@ -63,17 +63,20 @@ export default function MapComp({ form }: { form?: any }) {
         <Marker position={userLocation} />
       )}
       {/* <InputMarker p={userLocation} /> */}
-      <MapControl position={ControlPosition.TOP_CENTER}>
-        <PlaceAutocompleteClassic
-          onPlaceSelect={(place) => {
-            console.log("place", place);
-            // setUserMarker({
-            //   lat: place?.geometry?.location?.lat(),
-            //   lng: place?.geometry?.location?.lng(),
-            // });
-          }}
-        />
+      <MapControl position={ControlPosition.TOP}>
+        <div className="autocomplete-control mt-4">
+          <PlaceAutocompleteClassic
+            onPlaceSelect={(place) => {
+              console.log("place", place);
+              // setUserMarker({
+              //   lat: place?.geometry?.location?.lat(),
+              //   lng: place?.geometry?.location?.lng(),
+              // });
+            }}
+          />
+        </div>
       </MapControl>
+
       <MapControl position={ControlPosition.RIGHT_BOTTOM}>
         <CurrentLocation />
       </MapControl>

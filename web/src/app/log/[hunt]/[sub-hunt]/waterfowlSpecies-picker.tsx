@@ -73,11 +73,11 @@ export function SpeciesFieldArray({
             control={control}
             name={`hunters.${nestIndex}.species.${k}.name`}
             render={({ field }) => (
-              <FormItem className="flex flex-col">
+              <FormItem className="flex gap-4 items-center">
                 <FormLabel>Species</FormLabel>
                 <Popover>
                   <PopoverTrigger asChild>
-                    <FormControl>
+                    <FormControl className="w-56">
                       <Button
                         variant="outline"
                         role="combobox"
@@ -146,13 +146,19 @@ export function SpeciesFieldArray({
             name={`hunters.${nestIndex}.species.${k}.count`}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Count</FormLabel>
+                {/* <FormLabel>Count</FormLabel> */}
                 <FormControl>
                   <Input
                     type="number"
                     {...field}
                     placeholder="Count"
-                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                    onChange={(e) => {
+                      if (parseInt(e.target.value) < 0) {
+                        field.onChange(0);
+                      } else {
+                        field.onChange(parseInt(e.target.value));
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormMessage />

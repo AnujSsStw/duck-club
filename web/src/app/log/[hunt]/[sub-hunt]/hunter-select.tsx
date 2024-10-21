@@ -21,31 +21,13 @@ type Hunter = {
   memberShipType: "guest" | "member";
 };
 
-// Simulated API call
 const fetchUsers = async (query: string): Promise<Array<Hunter>> => {
-  // Simulate API delay
-  // await new Promise((resolve) => setTimeout(resolve, 500));
   const users = await fetch(
     `https://gallant-ant-192.convex.site/get-user/${query}`
   );
   const data: Hunter[] = await users.json();
 
   return data;
-  // // Simulated user data
-  // const allUsers = [
-  //   { id: 1, name: "Alice Johnson", email: "alice@example.com" },
-  //   { id: 2, name: "Bob Smith", email: "bob@example.com" },
-  //   { id: 3, name: "Charlie Brown", email: "charlie@example.com" },
-  //   { id: 4, name: "David Lee", email: "david@example.com" },
-  //   { id: 5, name: "Emma Wilson", email: "emma@example.com" },
-  // ];
-
-  // Filter users based on the query
-  // return data.filter(
-  //   (user) =>
-  //     user.fullName.toLowerCase().includes(query.toLowerCase()) ||
-  //     user.email.toLowerCase().includes(query.toLowerCase())
-  // );
 };
 
 export function HunterSelect({
@@ -193,7 +175,7 @@ export function HunterSelect({
         ) : (
           <ul className="space-y-4 ">
             {fields.map((field, index) => (
-              <Card key={field.id} className="">
+              <Card key={field.id} className="pt-4">
                 <CardContent>
                   {/* basic details */}
                   <div className="flex items-center justify-between mb-2">

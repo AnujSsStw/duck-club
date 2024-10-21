@@ -45,11 +45,11 @@ export function BlindsManager({
           control={form.control}
           name={`hunters.${index}.blinds.name`}
           render={({ field }) => (
-            <FormItem className="flex flex-col">
-              <FormLabel>Blinds</FormLabel>
+            <FormItem className="flex gap-4 items-center">
+              <FormLabel>Blind</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
-                  <FormControl>
+                  <FormControl className="w-40">
                     <Button
                       variant="outline"
                       role="combobox"
@@ -81,11 +81,11 @@ export function BlindsManager({
                             onSelect={() => {
                               form.setValue(
                                 `hunters.${index}.blinds.name`,
-                                s.alternativeName || s.name
+                                s.name
                               );
                             }}
                           >
-                            {s.alternativeName || s.name}
+                            {s.name}
                             <CheckIcon
                               className={cn(
                                 "ml-auto h-4 w-4",
@@ -109,14 +109,14 @@ export function BlindsManager({
           )}
         />
 
-        <Button
+        {/* <Button
           type="button"
           variant="outline"
           size="icon"
           onClick={() => remove(index)}
         >
           <Trash2 className="h-4 w-4" />
-        </Button>
+        </Button> */}
       </div>
     </>
   );

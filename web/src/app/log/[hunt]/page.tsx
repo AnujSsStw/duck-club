@@ -41,7 +41,6 @@ export default function CardDemo() {
           {hunt.map((h) => (
             <Button asChild={!h?.init} disabled={h?.init} key={h?._id}>
               <Link
-                as="button"
                 href={`/log/${pathname.split("/").pop()}/${h?._id}`}
                 className="uppercase"
               >
@@ -50,11 +49,15 @@ export default function CardDemo() {
             </Button>
           ))}
         </CardContent>
-        {/* <CardFooter>
-          <Button className="w-full">
-            <CheckIcon /> Mark all as read
-          </Button>
-        </CardFooter> */}
+        <CardFooter className="justify-center">
+          {hunt.every((h) => h?.init) && (
+            <div className="flex justify-center flex-col">
+              <Link href={"/"} className="flex items-center">
+                <CheckIcon /> All Done Go to Home
+              </Link>
+            </div>
+          )}
+        </CardFooter>
       </Card>
     </div>
   );

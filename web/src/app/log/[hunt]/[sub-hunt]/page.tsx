@@ -19,6 +19,8 @@ import { HunterSelect } from "./hunter-select";
 import { useMutation } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
+import { useState } from "react";
+import { Spinner } from "@/components/spinner";
 
 const FormSchema = z.object({
   pictures: z.instanceof(FileList).optional(),
@@ -56,10 +58,12 @@ const SubHunt = () => {
   });
   const generateUploadUrl = useMutation(api.upload_things.generateUploadUrl);
   const insertSubHunt = useMutation(api.subHunts.insertSubHunt);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     console.log("Sub hunt data submitted:", data);
+    setLoading(true);
     const p = pathname.split("/");
 
     // return;
@@ -106,12 +110,13 @@ const SubHunt = () => {
         blinds: hunter.blinds,
       })),
     });
+    setLoading(false);
 
     router.push(`/log/${p[2]}`);
   };
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-6">Log New Hunt</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -154,7 +159,8 @@ const SubHunt = () => {
             </CardContent>
           </Card>
 
-          <Button type="submit" className="w-full">
+          <Button disabled={loading} type="submit" className="w-full">
+            {loading && <Spinner className="mr-2 h-4 w-4 animate-spin" />}
             Log Hunt
           </Button>
         </form>
