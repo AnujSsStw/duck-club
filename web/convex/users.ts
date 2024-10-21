@@ -1,7 +1,32 @@
-import { internalMutation, query, QueryCtx } from "./_generated/server";
+import {
+  internalMutation,
+  internalQuery,
+  query,
+  QueryCtx,
+} from "./_generated/server";
 import { UserJSON } from "@clerk/backend";
 import { v, Validator } from "convex/values";
 import { Doc } from "./_generated/dataModel";
+
+export const getUserByQuery = internalQuery({
+  args: { query: v.string() },
+  handler: async (ctx, { query }) => {
+    return (
+      await ctx.db
+        .query("hunters")
+        .withSearchIndex("search_hunter", (q) => q.search("fullName", query))
+        .collect()
+    ).map((u) => {
+      return {
+        _id: u._id,
+        email: u.email,
+        fullName: u.fullName,
+        pictureUrl: u.pictureUrl,
+        memberShipType: u.memberShipType,
+      };
+    });
+  },
+});
 
 export const current = query({
   args: {},

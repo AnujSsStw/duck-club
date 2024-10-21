@@ -15,11 +15,15 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as fuckint_types from "../fuckint_types.js";
 import type * as http from "../http.js";
 import type * as hunts from "../hunts.js";
 import type * as init from "../init.js";
+import type * as queries_location from "../queries/location.js";
 import type * as queries_species from "../queries/species.js";
+import type * as queries_subHunt from "../queries/subHunt.js";
 import type * as subHunts from "../subHunts.js";
+import type * as upload_things from "../upload_things.js";
 import type * as users from "../users.js";
 
 /**
@@ -31,11 +35,15 @@ import type * as users from "../users.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  fuckint_types: typeof fuckint_types;
   http: typeof http;
   hunts: typeof hunts;
   init: typeof init;
+  "queries/location": typeof queries_location;
   "queries/species": typeof queries_species;
+  "queries/subHunt": typeof queries_subHunt;
   subHunts: typeof subHunts;
+  upload_things: typeof upload_things;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

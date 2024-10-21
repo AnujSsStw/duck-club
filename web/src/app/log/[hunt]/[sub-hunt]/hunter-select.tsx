@@ -1,41 +1,51 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useDebounce } from "use-debounce";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search, UserPlus, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { species } from "@/lib/constants";
-import { BlindsManager } from "@/app/log-hunt/blinds-picker";
-import {
-  SpeciesFieldArray,
-  WaterFlow,
-} from "@/app/log-hunt/waterfowlSpecies-picker";
+import { useDebounce } from "use-debounce";
+import { Doc, Id } from "../../../../../convex/_generated/dataModel";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BlindsManager } from "./blinds-picker";
+import { SpeciesFieldArray } from "./waterfowlSpecies-picker";
+
+type Hunter = {
+  _id: Id<"hunters">;
+  email: string;
+  fullName: string;
+  pictureUrl: string;
+  memberShipType: "guest" | "member";
+};
 
 // Simulated API call
-const fetchUsers = async (
-  query: string
-): Promise<Array<{ id: number; name: string; email: string }>> => {
+const fetchUsers = async (query: string): Promise<Array<Hunter>> => {
   // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  // await new Promise((resolve) => setTimeout(resolve, 500));
+  const users = await fetch(
+    `https://gallant-ant-192.convex.site/get-user/${query}`
+  );
+  const data: Hunter[] = await users.json();
 
-  // Simulated user data
-  const allUsers = [
-    { id: 1, name: "Alice Johnson", email: "alice@example.com" },
-    { id: 2, name: "Bob Smith", email: "bob@example.com" },
-    { id: 3, name: "Charlie Brown", email: "charlie@example.com" },
-    { id: 4, name: "David Lee", email: "david@example.com" },
-    { id: 5, name: "Emma Wilson", email: "emma@example.com" },
-  ];
+  return data;
+  // // Simulated user data
+  // const allUsers = [
+  //   { id: 1, name: "Alice Johnson", email: "alice@example.com" },
+  //   { id: 2, name: "Bob Smith", email: "bob@example.com" },
+  //   { id: 3, name: "Charlie Brown", email: "charlie@example.com" },
+  //   { id: 4, name: "David Lee", email: "david@example.com" },
+  //   { id: 5, name: "Emma Wilson", email: "emma@example.com" },
+  // ];
 
   // Filter users based on the query
-  return allUsers.filter(
-    (user) =>
-      user.name.toLowerCase().includes(query.toLowerCase()) ||
-      user.email.toLowerCase().includes(query.toLowerCase())
-  );
+  // return data.filter(
+  //   (user) =>
+  //     user.fullName.toLowerCase().includes(query.toLowerCase()) ||
+  //     user.email.toLowerCase().includes(query.toLowerCase())
+  // );
 };
 
 export function HunterSelect({
@@ -50,10 +60,12 @@ export function HunterSelect({
         species: {
           name: string;
           count: number;
+          id: string;
         }[];
         blinds: {
           name: string;
         };
+        pictureUrl: string;
       }[];
     },
     any,
@@ -62,13 +74,11 @@ export function HunterSelect({
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
-  const [searchResults, setSearchResults] = useState<
-    Array<{ id: string; name: string; email: string }>
-  >([]);
+  const [searchResults, setSearchResults] = useState<Array<Hunter>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, append, remove, prepend, insert } = useFieldArray({
     control: form.control,
     name: "hunters",
   });
@@ -83,9 +93,7 @@ export function HunterSelect({
     setError(null);
     try {
       const results = await fetchUsers(query);
-      setSearchResults(
-        results.map((user) => ({ ...user, id: user.id.toString() }))
-      );
+      setSearchResults(results.map((user) => ({ ...user })));
     } catch (err) {
       setError("Failed to fetch users. Please try again.");
       setSearchResults([]);
@@ -98,15 +106,19 @@ export function HunterSelect({
     performSearch(debouncedSearchTerm);
   }, [debouncedSearchTerm, performSearch]);
 
-  const handleAddUser = (user: { id: string; name: string; email: string }) => {
-    if (!fields.some((field) => field.hunterID === user.id)) {
-      append({
+  const handleAddUser = (user: Hunter) => {
+    if (!fields.some((field) => field.hunterID === user._id)) {
+      prepend({
         email: user.email,
-        name: user.name,
+        name: user.fullName,
         blinds: { name: "" },
-        species: [{ name: "", count: 0 }],
-        hunterID: user.id,
+        species: [{ name: "", count: 0, id: "" }],
+        hunterID: user._id,
+        pictureUrl: user.pictureUrl,
       });
+
+      // Clear search term after adding user
+      setSearchTerm("");
     }
   };
 
@@ -115,7 +127,7 @@ export function HunterSelect({
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="">
       <div className="mb-4">
         <div className="relative">
           <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-500" />
@@ -148,16 +160,22 @@ export function HunterSelect({
           <ul className="space-y-2">
             {searchResults.map((user) => (
               <li
-                key={user.id}
+                key={user._id}
                 className="flex items-center justify-between border-white  p-3 rounded-lg shadow"
               >
-                <div>
-                  <p className="font-medium">{user.name}</p>
-                  <p className="text-sm text-gray-500">{user.email}</p>
+                <div className="flex gap-2 items-center">
+                  <Avatar>
+                    <AvatarImage src={user.pictureUrl} />
+                    <AvatarFallback>Pic</AvatarFallback>
+                  </Avatar>
+                  <span>
+                    <p className="font-medium">{user.fullName}</p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </span>
                 </div>
                 <Button
                   onClick={() => handleAddUser(user)}
-                  disabled={fields.some((field) => field.hunterID === user.id)}
+                  disabled={fields.some((field) => field.hunterID === user._id)}
                 >
                   <UserPlus className="mr-2 h-4 w-4" />
                   Add
@@ -175,53 +193,69 @@ export function HunterSelect({
         ) : (
           <ul className="space-y-4 ">
             {fields.map((field, index) => (
-              <li
-                key={field.id}
-                className="border-white border  my-4 flex flex-col p-3 rounded-lg shadow"
-              >
-                {/* basic details */}
-                <div className="flex items-center justify-between mb-2">
+              <Card key={field.id} className="">
+                <CardContent>
+                  {/* basic details */}
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex gap-2 items-center">
+                      <FormField
+                        control={form.control}
+                        name={`hunters.${index}.pictureUrl`}
+                        render={({ field }) => (
+                          <Avatar>
+                            <AvatarImage src={field.value} />
+                            <AvatarFallback>Pic</AvatarFallback>
+                          </Avatar>
+                        )}
+                      />
+                      <span>
+                        <FormField
+                          control={form.control}
+                          name={`hunters.${index}.name`}
+                          render={({ field }) => (
+                            <p className="font-medium">{field.value}</p>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`hunters.${index}.email`}
+                          render={({ field }) => (
+                            <p className="text-sm text-gray-500">
+                              {field.value}
+                            </p>
+                          )}
+                        />
+                      </span>
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleRemoveUser(index)}
+                    >
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Remove user</span>
+                    </Button>
+                  </div>
+
+                  {/* blinds */}
                   <div>
-                    <FormField
-                      control={form.control}
-                      name={`hunters.${index}.name`}
-                      render={({ field }) => (
-                        <p className="font-medium">{field.value}</p>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name={`hunters.${index}.email`}
-                      render={({ field }) => (
-                        <p className="text-sm text-gray-500">{field.value}</p>
-                      )}
+                    <BlindsManager
+                      field={field}
+                      index={index}
+                      remove={remove}
+                      form={form}
                     />
                   </div>
 
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleRemoveUser(index)}
-                  >
-                    <X className="h-4 w-4" />
-                    <span className="sr-only">Remove user</span>
-                  </Button>
-                </div>
-
-                {/* blinds */}
-                <div>
-                  <BlindsManager
-                    field={field}
-                    index={index}
-                    remove={remove}
-                    form={form}
-                  />
-                </div>
-
-                {/* species */}
-                <div>
-                  <SpeciesFieldArray nestIndex={index} control={form.control} />
-                </div>
-              </li>
+                  {/* species */}
+                  <div>
+                    <SpeciesFieldArray
+                      nestIndex={index}
+                      control={form.control}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </ul>
         )}

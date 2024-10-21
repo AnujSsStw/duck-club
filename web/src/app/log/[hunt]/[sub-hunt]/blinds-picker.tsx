@@ -81,7 +81,7 @@ export function BlindsManager({
                             onSelect={() => {
                               form.setValue(
                                 `hunters.${index}.blinds.name`,
-                                s.name
+                                s.alternativeName || s.name
                               );
                             }}
                           >

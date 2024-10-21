@@ -35,6 +35,59 @@ http.route({
   }),
 });
 
+http.route({
+  pathPrefix: "/get-user/",
+  method: "OPTIONS",
+  handler: httpAction(async (_, request) => {
+    // Make sure the necessary headers are present
+    // for this to be a valid pre-flight request
+    const headers = request.headers;
+    if (
+      headers.get("Origin") !== null &&
+      headers.get("Access-Control-Request-Method") !== null &&
+      headers.get("Access-Control-Request-Headers") !== null
+    ) {
+      return new Response(null, {
+        headers: new Headers({
+          // e.g. https://mywebsite.com
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Max-Age": "86400",
+          "Content-Type": "application/json",
+        }),
+      });
+    } else {
+      return new Response();
+    }
+  }),
+});
+
+http.route({
+  pathPrefix: "/get-user/",
+  method: "GET",
+  handler: httpAction(async (ctx, request) => {
+    const q = request.url.split("/").pop() as string;
+    console.log("Query", q);
+
+    if (!q) {
+      return new Response(JSON.stringify([]), {
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const user = await ctx.runQuery(internal.users.getUserByQuery, {
+      query: q,
+    });
+    return new Response(JSON.stringify(user), {
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  }),
+});
+
 async function validateRequest(req: Request): Promise<WebhookEvent | null> {
   const payloadString = await req.text();
   const svixHeaders = {

@@ -21,7 +21,12 @@ export default function MapComp({ form }: { form?: any }) {
   const [userLocation, setUserLocation] = React.useState({ lat: 0, lng: 0 });
 
   return (
-    <APIProvider apiKey={process.env.GOOGLE_MAPS_API_KEY!}>
+    <APIProvider
+      apiKey={
+        process.env.GOOGLE_MAPS_API_KEY! ||
+        "AIzaSyBg0hdCUzY2WYG5DTiyWCVSr2_K9pDtdBI"
+      }
+    >
       {form && (
         <FormField
           control={form.control}

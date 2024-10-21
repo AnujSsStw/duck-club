@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 import { action, internalMutation, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { WeatherData } from "./fuckint_types";
 
 export const getSubHunts = query({
   args: { id: v.id("hunts") },
@@ -16,6 +17,21 @@ export const getSubHunts = query({
     return subHunts;
   },
 });
+
+const timeSlot = [
+  {
+    slot: "morning",
+    avgT: "07:00",
+  },
+  {
+    slot: "mid-day",
+    avgT: "12:00",
+  },
+  {
+    slot: "afternoon",
+    avgT: "17:00",
+  },
+];
 
 export const addHunt = action({
   args: {
@@ -35,15 +51,26 @@ export const addHunt = action({
       }
     );
 
-    const timeSlot = ["morning", "mid-day", "afternoon"];
     const subHunts: Array<Id<"subHunts">> = [];
 
+    // const weather = await fetch(
+    //   `http://api.weatherapi.com/v1/history.json?key=${process.env.WEATHER_API}&q=${args.location.lat},${args.location.lng}&aqi=no&dt=${args.date.split("T")[0]}`
+    // );
+    // const Weather_data = (await weather.json()) as WeatherData;
+
     for (const slot of timeSlot) {
+      // const weather_id = await ctx.runMutation(
+      //   internal.hunts.insertWeatherData,
+      //   {
+      //     locationID: locationId,
+      //     Weather_data: Weather_data.forecast.forecastday[0].hour.find(
+      //       (hour) => hour.time === `${args.date.split("T")[0]} ${slot.avgT}`
+      //     ),
+      //   }
+      // );
       const id = await ctx.runMutation(internal.hunts.insertsubHuntData, {
-        timeSlot: slot,
-        locationID: locationId,
-        creatorID: args.creatorID,
-        date: args.date,
+        timeSlot: slot.slot,
+        // weatherId: weather_id,
       });
       subHunts.push(id);
     }
@@ -51,6 +78,32 @@ export const addHunt = action({
     return ctx.runMutation(internal.hunts.insertHuntData, {
       subHunts,
       creatorID: args.creatorID,
+      date: args.date,
+      locationID: locationId,
+    });
+  },
+});
+
+// insert data into weatherConditions
+export const insertWeatherData = internalMutation({
+  args: {
+    locationID: v.id("huntLocations"),
+    Weather_data: v.any(), // type of this is WeatherData
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("weatherConditions", {
+      date: args.Weather_data.time,
+      locationID: args.locationID,
+      temperatureC: args.Weather_data.temp_c,
+      windDirection: args.Weather_data.wind_dir,
+      windSpeed: args.Weather_data.wind_kph,
+      precipitation: args.Weather_data.precip_mm,
+      condition: args.Weather_data.condition.text,
+      humidity: args.Weather_data.humidity,
+      visibility: args.Weather_data.vis_km,
+      uvIndex: args.Weather_data.uv,
+      source: "weatherapi.com",
+      time: args.Weather_data.time,
     });
   },
 });
@@ -60,11 +113,15 @@ export const insertHuntData = internalMutation({
   args: {
     subHunts: v.array(v.id("subHunts")),
     creatorID: v.id("hunters"),
+    date: v.string(),
+    locationID: v.id("huntLocations"),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("hunts", {
       createdBy: args.creatorID,
       subHunts: args.subHunts,
+      date: args.date,
+      locationID: args.locationID,
     });
   },
 });
@@ -73,17 +130,13 @@ export const insertHuntData = internalMutation({
 export const insertsubHuntData = internalMutation({
   args: {
     timeSlot: v.string(),
-    locationID: v.id("huntLocations"),
-    creatorID: v.id("hunters"),
-    date: v.string(),
+    weatherId: v.optional(v.id("weatherConditions")),
   },
   handler: async (ctx, args) => {
     return await ctx.db.insert("subHunts", {
       timeSlot: args.timeSlot as any,
-      locationID: args.locationID,
-      creatorId: args.creatorID,
-      date: args.date,
       init: false,
+      weatherConditionID: args.weatherId,
     });
   },
 });

@@ -24,140 +24,47 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { species } from "@/lib/constants";
+// import { species } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Plus, Trash2 } from "lucide-react";
-import { useFieldArray } from "react-hook-form";
-
-export function WaterFlow({
-  form,
-  field,
-  index,
-  remove,
-  i,
-}: {
-  form: any;
-  field: any;
-  index: number;
-  remove: (index: number) => void;
-  i: number;
-}) {
-  // const species = useQuery(api.queries.species.getWaterfowlSpecies);
-
-  if (!species) return null;
-
-  return (
-    <div key={field.id} className="flex items-end space-x-2 mb-4">
-      <FormField
-        control={control}
-        name={`hunters.${nestIndex}.species.${k}.name`}
-        render={({ field }) => (
-          <FormItem className="flex flex-col">
-            <FormLabel>Species</FormLabel>
-            <Popover>
-              <PopoverTrigger asChild>
-                <FormControl>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className={cn(
-                      " justify-between",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value
-                      ? species.find((s) => s.name === field.value)?.name
-                      : "Select Species"}
-                    <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </FormControl>
-              </PopoverTrigger>
-              <PopoverContent className=" p-0">
-                <Command>
-                  <CommandInput
-                    placeholder="Search Species..."
-                    className="h-9"
-                  />
-                  <CommandList>
-                    <CommandEmpty>No Species found.</CommandEmpty>
-                    <CommandGroup>
-                      {species.map((s) => (
-                        <CommandItem
-                          value={s.name}
-                          key={s._id}
-                          onSelect={() => {
-                            form.setValue(
-                              `waterfowlSpecies.${index}.species`,
-                              s.name
-                            );
-                          }}
-                        >
-                          {s.name}
-                          <CheckIcon
-                            className={cn(
-                              "ml-auto h-4 w-4",
-                              s.name === field.value
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
-            {/* <FormDescription>
-            This is the language that will be used in the dashboard.
-          </FormDescription> */}
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <FormField
-        control={form.control}
-        name={`hunters.${index}species.${i}.count`}
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Count</FormLabel>
-            <FormControl>
-              <Input
-                type="number"
-                {...field}
-                onChange={(e) => field.onChange(parseInt(e.target.value, 10))}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-
-      <Button
-        type="button"
-        variant="outline"
-        size="icon"
-        onClick={() => remove(index)}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
-  );
-}
+import { Control, useFieldArray } from "react-hook-form";
+import { useQuery } from "convex/react";
+import { Loading } from "@/components/loading";
+import { api } from "../../../../../convex/_generated/api";
 
 export function SpeciesFieldArray({
   nestIndex,
   control,
 }: {
   nestIndex: number;
-  control: any;
+  control: Control<
+    {
+      hunters: {
+        hunterID: string;
+        name: string;
+        email: string;
+        species: {
+          name: string;
+          count: number;
+          id: string;
+        }[];
+        blinds: {
+          name: string;
+        };
+        pictureUrl: string;
+      }[];
+    },
+    any
+  >;
 }) {
-  const { fields, append, remove } = useFieldArray({
+  const species = useQuery(api.queries.species.getWaterfowlSpecies);
+
+  const { fields, append, remove, update } = useFieldArray({
     control,
     name: `hunters.${nestIndex}.species`,
   });
 
+  if (!species) return <Loading />;
   return (
     <div>
       {fields.map((field, k) => (
@@ -200,12 +107,14 @@ export function SpeciesFieldArray({
                               value={s.name}
                               key={s._id}
                               onSelect={() => {
-                                field.onChange(s.name);
+                                // field.onChange(s.name);
 
-                                // setValue(
-                                //   `hunters.${nestIndex}.species.${k}.name`,
-                                //   s.name
-                                // );
+                                // set the id of the species
+                                update(k, {
+                                  count: fields[k].count,
+                                  id: s._id,
+                                  name: s.name,
+                                });
                               }}
                             >
                               {s.name}
@@ -266,7 +175,7 @@ export function SpeciesFieldArray({
         variant="outline"
         size="sm"
         className="mt-2"
-        onClick={() => append({ name: "", count: 0 })}
+        onClick={() => append({ name: "", count: 0, id: "" })}
       >
         <Plus className="h-4 w-4 mr-2" />
         Add Species

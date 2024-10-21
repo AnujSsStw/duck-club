@@ -48,6 +48,7 @@ export default defineSchema(
       visibility: v.number(),
       uvIndex: v.number(),
       source: v.string(),
+      time: v.string(),
     }),
 
     subHunts: defineTable({
@@ -55,40 +56,40 @@ export default defineSchema(
       hunterIDs: v.optional(v.array(v.id("hunters"))),
       pictures: v.optional(v.array(v.string())),
       totalWaterfowl: v.optional(v.number()),
-      blindUsed: v.optional(v.id("duckBlinds")),
 
-      creatorId: v.id("hunters"),
-      locationID: v.id("huntLocations"),
-      date: v.string(),
-      timeSlot: v.union(
-        v.literal("morning"),
-        v.literal("mid-day"),
-        v.literal("afternoon")
+      timeSlot: v.optional(
+        v.union(
+          v.literal("morning"),
+          v.literal("mid-day"),
+          v.literal("afternoon")
+        )
       ),
       init: v.boolean(),
-    }).index("by_date", ["date"]),
+    }),
 
     huntersHunts: defineTable({
       hunterID: v.id("hunters"),
       huntID: v.id("subHunts"),
       blindId: v.id("duckBlinds"),
-      speciesId: v.id("waterfowlSpecies"),
     }).index("by_hunterID", ["hunterID"]),
+
+    harvestDetails: defineTable({
+      huntId: v.id("subHunts"),
+      hunterID: v.id("hunters"),
+      speciesId: v.id("waterfowlSpecies"),
+      quantity: v.number(),
+    }).index("by_huntId_and_hunterId", ["huntId", "hunterID"]),
 
     waterfowlSpecies: defineTable({
       // predefined species
       name: v.string(),
     }),
 
-    harvestDetails: defineTable({
-      huntId: v.id("subHunts"),
-      speciesId: v.id("waterfowlSpecies"),
-      quantity: v.number(),
-    }).index("by_huntId", ["huntId"]),
-
     hunts: defineTable({
       subHunts: v.array(v.id("subHunts")),
       createdBy: v.id("hunters"),
+      locationID: v.id("huntLocations"),
+      date: v.string(),
     }),
   },
   { schemaValidation: true }
