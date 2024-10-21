@@ -26,9 +26,6 @@ export default function Home() {
             Duck Club App
           </Link>
           <div className="flex gap-4">
-            <Button asChild className="no-underline">
-              <Link href="/log">Log</Link>
-            </Button>
             <SignInAndSignUpButtons />
           </div>
         </div>
@@ -50,6 +47,9 @@ function SignInAndSignUpButtons() {
   return (
     <div className="flex gap-4">
       <Authenticated>
+        <Button asChild className="no-underline">
+          <Link href="/log">Log</Link>
+        </Button>
         <UserButton afterSignOutUrl="#" />
       </Authenticated>
       <Unauthenticated>
