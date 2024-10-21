@@ -8,6 +8,18 @@ import { UserJSON } from "@clerk/backend";
 import { v, Validator } from "convex/values";
 import { Doc } from "./_generated/dataModel";
 
+export const getUserBy_tokenIdentifier = internalQuery({
+  args: { tokenIdentifier: v.string() },
+  handler: async (ctx, { tokenIdentifier }) => {
+    return await ctx.db
+      .query("hunters")
+      .withIndex("by_tokenIdentifier", (q) =>
+        q.eq("tokenIdentifier", tokenIdentifier)
+      )
+      .unique();
+  },
+});
+
 export const getUserByQuery = internalQuery({
   args: { query: v.string() },
   handler: async (ctx, { query }) => {

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { HunterSelect } from "./hunter-select";
@@ -56,6 +56,7 @@ const SubHunt = () => {
   });
   const generateUploadUrl = useMutation(api.upload_things.generateUploadUrl);
   const insertSubHunt = useMutation(api.subHunts.insertSubHunt);
+  const router = useRouter();
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     console.log("Sub hunt data submitted:", data);
@@ -105,6 +106,8 @@ const SubHunt = () => {
         blinds: hunter.blinds,
       })),
     });
+
+    router.push(`/log/${p[2]}`);
   };
 
   return (

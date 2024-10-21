@@ -19,7 +19,7 @@ import type * as fuckint_types from "../fuckint_types.js";
 import type * as http from "../http.js";
 import type * as hunts from "../hunts.js";
 import type * as init from "../init.js";
-import type * as queries_location from "../queries/location.js";
+import type * as queries_data from "../queries/data.js";
 import type * as queries_species from "../queries/species.js";
 import type * as queries_subHunt from "../queries/subHunt.js";
 import type * as subHunts from "../subHunts.js";
@@ -39,7 +39,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   hunts: typeof hunts;
   init: typeof init;
-  "queries/location": typeof queries_location;
+  "queries/data": typeof queries_data;
   "queries/species": typeof queries_species;
   "queries/subHunt": typeof queries_subHunt;
   subHunts: typeof subHunts;

@@ -3,6 +3,7 @@ import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { WebhookEvent } from "@clerk/backend";
 import { Webhook } from "svix";
+import { getData } from "./queries/data";
 
 const http = httpRouter();
 
@@ -86,6 +87,12 @@ http.route({
       },
     });
   }),
+});
+
+http.route({
+  path: "/data",
+  method: "GET",
+  handler: getData,
 });
 
 async function validateRequest(req: Request): Promise<WebhookEvent | null> {

@@ -14,6 +14,7 @@ export default defineSchema(
       memberShipType: v.union(v.literal("guest"), v.literal("member")),
     })
       .index("by_email", ["email"])
+      .index("by_tokenIdentifier", ["tokenIdentifier"])
       .searchIndex("search_hunter", {
         searchField: "fullName",
         filterFields: ["email"],
@@ -37,18 +38,17 @@ export default defineSchema(
     }).index("by_huntLocationId", ["huntLocationId"]),
 
     weatherConditions: defineTable({
-      date: v.string(),
+      dt: v.string(),
       locationID: v.id("huntLocations"),
       temperatureC: v.number(),
       windDirection: v.string(),
       windSpeed: v.number(),
-      precipitation: v.string(),
+      precipitation: v.number(),
       condition: v.string(),
       humidity: v.number(),
       visibility: v.number(),
       uvIndex: v.number(),
       source: v.string(),
-      time: v.string(),
     }),
 
     subHunts: defineTable({
@@ -90,7 +90,7 @@ export default defineSchema(
       createdBy: v.id("hunters"),
       locationID: v.id("huntLocations"),
       date: v.string(),
-    }),
+    }).index("by_createdBy", ["createdBy"]),
   },
   { schemaValidation: true }
 );

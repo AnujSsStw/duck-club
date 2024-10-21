@@ -26,6 +26,8 @@ export default function CardDemo() {
   });
   if (!hunt) return <Loading />;
 
+  console.log(hunt);
+
   return (
     <div className="flex  w-full h-screen justify-center items-center">
       <Card className={cn("w-[380px]")}>
@@ -37,8 +39,9 @@ export default function CardDemo() {
         </CardHeader>
         <CardContent className="grid gap-4">
           {hunt.map((h) => (
-            <Button asChild key={h?._id}>
+            <Button asChild={!h?.init} disabled={h?.init} key={h?._id}>
               <Link
+                as="button"
                 href={`/log/${pathname.split("/").pop()}/${h?._id}`}
                 className="uppercase"
               >
