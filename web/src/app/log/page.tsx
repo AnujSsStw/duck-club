@@ -1,18 +1,17 @@
 "use client";
 
+import { CalendarForm } from "@/app/log/date-picker";
+import { Loading } from "@/components/loading";
 import MapComp from "@/components/map/map";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAction, useQuery } from "convex/react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { CalendarForm } from "@/app/log/date-picker";
-import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
-import { useUser } from "@clerk/clerk-react";
-import { useRouter } from "next/navigation";
-import { Loading } from "@/components/loading";
 
 const FormSchema = z.object({
   date: z.date({ required_error: "Start date is required" }),
@@ -45,32 +44,34 @@ const LogHunt = () => {
       location: data.location,
     });
 
-    router.push(`/log/${id}`);
+    router.push(`/log/${id.noSql_huntsId}`);
   };
 
   return (
-    <div className="max-w-2xl mx-auto m-10">
+    <div className="w-full max-w-2xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6 flex flex-col justify-center"
+          className="space-y-6"
         >
           <Card>
             <CardHeader>
-              <CardTitle>Hunt Details</CardTitle>
+              <CardTitle className="text-xl sm:text-2xl">Hunt Details</CardTitle>
             </CardHeader>
 
             <CardContent className="space-y-4">
-              <MapComp form={form} />
+              <div className="aspect-w-16 aspect-h-9 sm:aspect-h-7">
+                <MapComp form={form} />
+              </div>
 
-              <div className="flex space-x-4">
-                <div className="flex-1">
+              <div className="sm:flex sm:space-x-4">
+                <div className="w-full sm:w-1/2 mb-4 sm:mb-0">
                   <CalendarForm form={form} label="Date" name="date" />
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Button type="submit">Create Hunt</Button>
+          <Button type="submit" className="w-full sm:w-auto">Create Hunt</Button>
         </form>
       </Form>
     </div>

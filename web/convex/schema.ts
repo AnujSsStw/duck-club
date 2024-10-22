@@ -91,6 +91,80 @@ export default defineSchema(
       locationID: v.id("huntLocations"),
       date: v.string(),
     }).index("by_createdBy", ["createdBy"]),
+
+    huntsAllData: defineTable({
+      // Hunt details
+      date: v.optional(v.string()),
+      locationName: v.optional(v.string()),
+      locationDescription: v.optional(v.string()),
+      latitude: v.optional(v.number()),
+      longitude: v.optional(v.number()),
+      state: v.optional(v.string()),
+      county: v.optional(v.string()),
+      city: v.optional(v.string()),
+
+      // Hunt sessions
+      sessions: v.optional(v.array(v.object({
+        timeSlot: v.optional(v.union(
+          v.literal("morning"),
+          v.literal("mid-day"),
+          v.literal("afternoon")
+        )),
+        totalWaterfowl: v.optional(v.number()),
+        pictures: v.optional(v.array(v.string())),
+
+        // Weather conditions for this session
+        weather: v.object({
+          dt: v.string(),
+          temperatureC: v.number(),
+          windDirection: v.string(),
+          windSpeed: v.number(),
+          precipitation: v.number(),
+          condition: v.string(),
+          humidity: v.number(),
+          visibility: v.number(),
+          uvIndex: v.number(),
+          source: v.string(),
+        }),
+
+        // Hunter details for this session
+        hunters: v.optional(v.array(v.object({
+          id: v.optional(v.id("hunters")),
+          email: v.optional(v.string()),
+          firstName: v.optional(v.string()),
+          lastName: v.optional(v.string()),
+          fullName: v.optional(v.string()),
+          pictureUrl: v.optional(v.string()),
+          phoneNumber: v.optional(v.string()),
+          memberShipType: v.optional(v.union(v.literal("guest"), v.literal("member"))),
+
+          // Duck blind for this hunter in this session
+          duckBlind: v.optional(v.object({
+            id: v.optional(v.id("duckBlinds")),
+            name: v.optional(v.string()),
+            latitude: v.optional(v.number()),
+            longitude: v.optional(v.number()),
+          })),
+
+          // Harvests for this hunter in this session
+          harvests: v.optional(v.array(v.object({
+            speciesId: v.optional(v.id("waterfowlSpecies")),
+            speciesName: v.optional(v.string()),
+            quantity: v.optional(v.number()),
+          }))),
+        }))),
+      }))),
+
+      // Metadata
+      createdBy: v.optional(v.id("hunters")),
+      updatedAt: v.optional(v.string()),
+    }).index("by_date", ["date"])
+      .index("by_location", ["state", "county", "city"])
+      .index("by_createdBy", ["createdBy"])
+      .searchIndex("search_hunts", {
+        searchField: "locationName",
+        filterFields: ["state", "county", "city", "date"],
+      }),
   },
   { schemaValidation: true }
 );

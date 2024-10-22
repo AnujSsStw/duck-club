@@ -1,6 +1,7 @@
 import {
   internalMutation,
   internalQuery,
+  mutation,
   query,
   QueryCtx,
 } from "./_generated/server";
@@ -40,6 +41,23 @@ export const getUserByQuery = internalQuery({
   },
 });
 
+export const addGuestHunter = mutation({
+  args: { name: v.string() },
+  handler: async (ctx, { name }) => {
+    const userAttributes = {
+      email: "",
+      fullName: name,
+      memberShipType: "guest" as "guest" | "member",
+      firstName: "",
+      lastName: "",
+      pictureUrl: "https://api.dicebear.com/9.x/lorelei/svg",
+      tokenIdentifier: "",
+      phoneNumber: "",
+    };
+    await ctx.db.insert("hunters", userAttributes);
+  },
+});
+
 export const current = query({
   args: {},
   handler: async (ctx) => {
@@ -57,7 +75,7 @@ export const upsertFromClerk = internalMutation({
       fullName: `${data.first_name} ${data.last_name ?? ""}`,
       pictureUrl: data.image_url,
       tokenIdentifier: data.id,
-      memberShipType: "guest" as "guest" | "member",
+      memberShipType: "member" as "guest" | "member",
       phoneNumber: data.phone_numbers[0]?.phone_number,
     };
 

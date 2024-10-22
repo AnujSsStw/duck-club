@@ -16,9 +16,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
-  return (
+  return (    
     <>
       <StickyHeader className="px-4 py-4">
         <div className="flex justify-between items-center">
@@ -66,43 +67,36 @@ function SignInAndSignUpButtons() {
 
 function SignedInContent() {
   const user = useQuery(api.users.current);
-  const hunts = useQuery(api.hunts.getHunts, {
-    id: user?._id,
+  const hunts = useQuery(api.huntsAllData.getHuntsByCreator, {
+    creatorId: user?._id,
   });
   if (!hunts) return <Loading />;
-  console.log(hunts);
 
   return (
-    <>
-      <div className="h-full px-4 py-6 w-[75%] mx-auto">
-        <Table>
-          <TableCaption>A list of your Log Hunts.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Created At</TableHead>
-              <TableHead>Location</TableHead>
-              <TableHead>Hunt Date</TableHead>
-              <TableHead className="text-right">View</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {hunts.map((hunt) => (
-              <TableRow key={hunt._id}>
-                <TableCell>
-                  {new Date(hunt._creationTime).toLocaleDateString()}
-                </TableCell>
-                <TableCell>{hunt.locationName}</TableCell>
-                <TableCell>{new Date(hunt.date).toDateString()}</TableCell>
-                <TableCell className="text-right">
-                  <Button asChild className="no-underline">
-                    <Link href={`/log/${hunt._id}`}>View</Link>
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+    <div className="w-full px-4 py-6 md:w-[90%] lg:w-[75%] mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Your Log Hunts</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {hunts.map((hunt) => (
+          <Card key={hunt.id}>
+            <CardHeader>
+              <CardTitle className="text-lg">{hunt.location}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-gray-500">
+                Created: {new Date(hunt.createdAt!).toLocaleDateString()}
+              </p>
+              <p className="text-sm text-gray-500">
+                Hunt Date: {new Date(hunt.date!).toDateString()}
+              </p>
+            </CardContent>
+            <CardFooter>
+              <Button asChild className="w-full">
+                <Link href={`/log/${hunt.id}`}>View Details</Link>
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
       </div>
-    </>
+    </div>
   );
 }

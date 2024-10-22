@@ -5,13 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search, UserPlus, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { useDebounce } from "use-debounce";
 import { Doc, Id } from "../../../../../convex/_generated/dataModel";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { BlindsManager } from "./blinds-picker";
 import { SpeciesFieldArray } from "./waterfowlSpecies-picker";
+
+import { GuestHunter } from "./guest-hunter";
+
 
 type Hunter = {
   _id: Id<"hunters">;
@@ -136,6 +139,18 @@ export function HunterSelect({
         </div>
       )}
 
+      {/* add a or seprator */}
+      <div className="flex items-center justify-center">
+        <div className="w-1/2 h-px bg-gray-200"></div>
+        <p className="px-4 text-gray-500">or</p>
+        <div className="w-1/2 h-px bg-gray-200"></div>
+      </div>
+
+      {!isLoading && !error && searchResults.length === 0 && (
+        // create a new hunter
+        <GuestHunter />
+      )}
+
       {!isLoading && !error && searchResults.length > 0 && (
         <div className="mb-6">
           <h2 className="text-lg font-semibold mb-2">Search Results</h2>
@@ -143,21 +158,22 @@ export function HunterSelect({
             {searchResults.map((user) => (
               <li
                 key={user._id}
-                className="flex items-center justify-between border-white  p-3 rounded-lg shadow"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-white p-3 rounded-lg shadow"
               >
-                <div className="flex gap-2 items-center">
-                  <Avatar>
+                <div className="flex items-center mb-2 sm:mb-0">
+                  <Avatar className="mr-2 flex-shrink-0">
                     <AvatarImage src={user.pictureUrl} />
                     <AvatarFallback>Pic</AvatarFallback>
                   </Avatar>
-                  <span>
-                    <p className="font-medium">{user.fullName}</p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
-                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium truncate">{user.fullName}</p>
+                    <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                  </div>
                 </div>
                 <Button
                   onClick={() => handleAddUser(user)}
                   disabled={fields.some((field) => field.hunterID === user._id)}
+                  className="w-full sm:w-auto mt-2 sm:mt-0"
                 >
                   <UserPlus className="mr-2 h-4 w-4" />
                   Add

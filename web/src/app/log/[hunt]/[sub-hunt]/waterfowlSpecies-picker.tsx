@@ -66,24 +66,25 @@ export function SpeciesFieldArray({
 
   if (!species) return <Loading />;
   return (
-    <div>
+    <div className="space-y-4">
       {fields.map((field, k) => (
-        <div key={field.id} className="flex items-end space-x-2 mb-4">
+        <div key={field.id} className="flex flex-row items-center gap-2">
           <FormField
             control={control}
             name={`hunters.${nestIndex}.species.${k}.name`}
             render={({ field }) => (
-              <FormItem className="flex gap-4 items-center">
-                <FormLabel>Species</FormLabel>
+              <FormItem className="w-full">
                 <Popover>
                   <PopoverTrigger asChild>
-                    <FormControl className="w-56">
+                    <FormControl>
                       <Button
                         variant="outline"
                         role="combobox"
                         className={cn(
-                          " justify-between",
-                          !field.value && "text-muted-foreground"
+                          "justify-between",
+                          !field.value && "text-muted-foreground",
+                          "truncate",
+                          "w-48 sm:w-full"
                         )}
                       >
                         {field.value
@@ -93,7 +94,7 @@ export function SpeciesFieldArray({
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
-                  <PopoverContent className=" p-0">
+                  <PopoverContent className="w-full p-0">
                     <Command>
                       <CommandInput
                         placeholder="Search Species..."
@@ -107,9 +108,6 @@ export function SpeciesFieldArray({
                               value={s.name}
                               key={s._id}
                               onSelect={() => {
-                                // field.onChange(s.name);
-
-                                // set the id of the species
                                 update(k, {
                                   count: fields[k].count,
                                   id: s._id,
@@ -133,46 +131,47 @@ export function SpeciesFieldArray({
                     </Command>
                   </PopoverContent>
                 </Popover>
-                {/* <FormDescription>
-            This is the language that will be used in the dashboard.
-          </FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <FormField
-            control={control}
-            name={`hunters.${nestIndex}.species.${k}.count`}
-            render={({ field }) => (
-              <FormItem>
-                {/* <FormLabel>Count</FormLabel> */}
-                <FormControl>
-                  <Input
-                    type="number"
-                    {...field}
-                    placeholder="Count"
-                    onChange={(e) => {
-                      if (parseInt(e.target.value) < 0) {
-                        field.onChange(0);
-                      } else {
-                        field.onChange(parseInt(e.target.value));
-                      }
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button
-            type="button"
-            variant="outline"
-            size="icon"
-            onClick={() => remove(k)}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center space-x-2 w-full sm:w-auto">
+            <FormField
+              control={control}
+              name={`hunters.${nestIndex}.species.${k}.count`}
+              render={({ field }) => (
+                <FormItem className="flex-grow sm:flex-grow-0">
+                  <FormControl>
+                    <Input
+                      type="number"
+                      {...field}
+                      placeholder="Count"
+                      className="w-full sm:w-20"
+                      min={1}
+                      max={10}
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        field.onChange(Math.min(Math.max(value, 1), 10));
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => remove(k)}
+              className="flex-shrink-0"
+            >
+              <Trash2 className="h-4 w-4" color="red" />
+              <span className="sr-only">Remove species</span>
+            </Button>
+          </div>
         </div>
       ))}
 
@@ -180,7 +179,7 @@ export function SpeciesFieldArray({
         type="button"
         variant="outline"
         size="sm"
-        className="mt-2"
+        className="w-full sm:w-auto"
         onClick={() => append({ name: "", count: 0, id: "" })}
       >
         <Plus className="h-4 w-4 mr-2" />

@@ -63,7 +63,7 @@ export const addHunt = action({
     creatorID: v.id("hunters"),
     location: v.object({ lat: v.number(), lng: v.number() }),
   },
-  handler: async (ctx, args): Promise<Id<"hunts">> => {
+  handler: async (ctx, args): Promise<{  noSql_huntsId: Id<"huntsAllData"> }> => {
     const location = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${args.location.lat},${args.location.lng}&key=${process.env.GOOGLE_MAPS_API}`
     );
@@ -75,36 +75,47 @@ export const addHunt = action({
       }
     );
 
-    const subHunts: Array<Id<"subHunts">> = [];
+    // const subHunts: Array<Id<"subHunts">> = [];
 
-    const weather = await fetch(
-      `http://api.weatherapi.com/v1/history.json?key=${process.env.WEATHER_API}&q=${args.location.lat},${args.location.lng}&aqi=no&dt=${args.date.split("T")[0]}`
-    );
-    const Weather_data = (await weather.json()) as WeatherData;
+    // const weather = await fetch(
+    //   `http://api.weatherapi.com/v1/history.json?key=${process.env.WEATHER_API}&q=${args.location.lat},${args.location.lng}&aqi=no&dt=${args.date.split("T")[0]}`
+    // );
+    // const Weather_data = (await weather.json()) as WeatherData;
 
-    for (const slot of timeSlot) {
-      const weather_id = await ctx.runMutation(
-        internal.hunts.insertWeatherData,
-        {
-          locationID: locationId,
-          Weather_data: Weather_data.forecast.forecastday[0].hour.find(
-            (hour) => hour.time === `${args.date.split("T")[0]} ${slot.avgT}`
-          ),
-        }
-      );
-      const id = await ctx.runMutation(internal.hunts.insertsubHuntData, {
-        timeSlot: slot.slot,
-        weatherId: weather_id,
-      });
-      subHunts.push(id);
-    }
+    // for (const slot of timeSlot) {
+    //   const weather_id = await ctx.runMutation(
+    //     internal.hunts.insertWeatherData,
+    //     {
+    //       locationID: locationId,
+    //       Weather_data: Weather_data.forecast.forecastday[0].hour.find(
+    //         (hour) => hour.time === `${args.date.split("T")[0]} ${slot.avgT}`
+    //       ),
+    //     }
+    //   );
+    //   const id = await ctx.runMutation(internal.hunts.insertsubHuntData, {
+    //     timeSlot: slot.slot,
+    //     weatherId: weather_id,
+    //   });
+    //   subHunts.push(id);
+    // }
 
-    return ctx.runMutation(internal.hunts.insertHuntData, {
-      subHunts,
-      creatorID: args.creatorID,
+    // for new table
+    const noSql_huntsId = await ctx.runMutation(internal.huntsAllData.initializeHunt, {
+      createdBy: args.creatorID,
       date: args.date,
-      locationID: locationId,
-    });
+      locationId: locationId
+    })
+
+    // const d = await ctx.runMutation(internal.hunts.insertHuntData, {
+    //   subHunts,
+    //   creatorID: args.creatorID,
+    //   date: args.date,
+    //   locationID: locationId,
+    // });
+    return {
+      // huntsId: d,
+      noSql_huntsId: noSql_huntsId
+    }
   },
 });
 
@@ -209,3 +220,4 @@ export function extractLocationData(data: { results: any[] }) {
     ]),
   };
 }
+

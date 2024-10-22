@@ -1,4 +1,4 @@
-import { useMapsLibrary } from "@vis.gl/react-google-maps";
+import { useMap, useMapsLibrary } from "@vis.gl/react-google-maps";
 import { useEffect, useRef, useState } from "react";
 
 interface Props {
@@ -12,6 +12,7 @@ export const PlaceAutocompleteClassic = ({ onPlaceSelect }: Props) => {
     useState<google.maps.places.Autocomplete | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const places = useMapsLibrary("places");
+  const map = useMap();
 
   useEffect(() => {
     if (!places || !inputRef.current) return;
@@ -25,15 +26,24 @@ export const PlaceAutocompleteClassic = ({ onPlaceSelect }: Props) => {
 
   useEffect(() => {
     if (!placeAutocomplete) return;
+    if (!map) return;
 
     placeAutocomplete.addListener("place_changed", () => {
       onPlaceSelect(placeAutocomplete.getPlace());
+      const location = placeAutocomplete.getPlace().geometry?.location;
+      if (location) {
+        map.setCenter({
+          lat: location.lat(),
+          lng: location.lng(),
+        });
+        map.setZoom(15);
+      }
     });
   }, [onPlaceSelect, placeAutocomplete]);
 
   return (
     <div className="autocomplete-container ">
-      <input ref={inputRef} className="text-black  p-3" />
+      <input ref={inputRef} className="text-black  p-2" />
     </div>
   );
 };

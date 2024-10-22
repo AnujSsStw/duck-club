@@ -18,6 +18,7 @@ import type {
 import type * as fuckint_types from "../fuckint_types.js";
 import type * as http from "../http.js";
 import type * as hunts from "../hunts.js";
+import type * as huntsAllData from "../huntsAllData.js";
 import type * as init from "../init.js";
 import type * as queries_data from "../queries/data.js";
 import type * as queries_species from "../queries/species.js";
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   fuckint_types: typeof fuckint_types;
   http: typeof http;
   hunts: typeof hunts;
+  huntsAllData: typeof huntsAllData;
   init: typeof init;
   "queries/data": typeof queries_data;
   "queries/species": typeof queries_species;

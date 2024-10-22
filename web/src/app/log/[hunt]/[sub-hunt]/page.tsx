@@ -16,11 +16,13 @@ import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { HunterSelect } from "./hunter-select";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { useState } from "react";
 import { Spinner } from "@/components/spinner";
+import { getWeatherData } from "@/lib/get-weather-data";
+import { Loading } from "@/components/loading";
 
 const FormSchema = z.object({
   pictures: z.instanceof(FileList).optional(),
@@ -52,14 +54,33 @@ const SubHunt = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      hunters: [],
+      hunters: [
+        // add a dummy hunter
+        {
+          name: "Sam",
+          email: "sam@gmail.com",
+          hunterID: "",
+          blinds: {
+            name: "",
+          },
+          species: [],
+        },
+      ],
       pictures: undefined,
     },
   });
   const generateUploadUrl = useMutation(api.upload_things.generateUploadUrl);
   const insertSubHunt = useMutation(api.subHunts.insertSubHunt);
+
+  // noSql_hunt inplementation
+  const addHuntSession = useMutation(api.huntsAllData.addHuntSession);
+  const getHuntLocation = useQuery(api.huntsAllData.getHuntLocation, {
+    huntId: pathname.split("/")[2] as Id<"huntsAllData">,
+  });
+
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  if (!getHuntLocation) return <Loading />;
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     console.log("Sub hunt data submitted:", data);
@@ -97,44 +118,51 @@ const SubHunt = () => {
       successfulImageIds = imageIds.filter((id) => id !== null);
     }
 
-    await insertSubHunt({
+    const weatherData = await getWeatherData(getHuntLocation.date!, { lat: getHuntLocation?.latitude!, lng: getHuntLocation?.longitude! }, p[3] as "morning" | "mid-day" | "afternoon");
+
+    await addHuntSession({
+      huntId: p[2] as Id<"huntsAllData">,
+      timeSlot: p[3] as "morning" | "mid-day" | "afternoon",
       pictures: successfulImageIds,
-      huntId: p[2] as Id<"hunts">,
-      subHuntId: p[3] as Id<"subHunts">,
       hunters: data.hunters.map((hunter) => ({
         hunterID: hunter.hunterID as Id<"hunters">,
         species: hunter.species.map((species) => ({
           id: species.id as Id<"waterfowlSpecies">,
+          name: species.name,
           count: species.count,
         })),
         blinds: hunter.blinds,
       })),
+      weather: weatherData,
     });
+    // await insertSubHunt({
+    //   pictures: successfulImageIds,
+    //   huntId: p[2] as Id<"hunts">,
+    //   subHuntId: p[3] as Id<"subHunts">,
+    //   hunters: data.hunters.map((hunter) => ({
+    //     hunterID: hunter.hunterID as Id<"hunters">,
+    //     species: hunter.species.map((species) => ({
+    //       id: species.id as Id<"waterfowlSpecies">,
+    //       count: species.count,
+    //     })),
+    //     blinds: hunter.blinds,
+    //   })),
+    // });
     setLoading(false);
 
     router.push(`/log/${p[2]}`);
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Log New Hunt</h2>
+    <div className="p-4 sm:p-6 max-w-4xl mx-auto">
+      <h2 className="text-2xl font-bold mb-4 sm:mb-6">Log New Hunt</h2>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Hunters</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {/* @ts-ignore */}
-              <HunterSelect form={form} />
-            </CardContent>
-          </Card>
-
-          {/* <DropZone /> */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+          <HunterSelect form={form} />
 
           <Card>
             <CardHeader>
-              <CardTitle>Pictures</CardTitle>
+              <CardTitle className="text-lg sm:text-xl">Pictures</CardTitle>
             </CardHeader>
             <CardContent>
               <FormField
@@ -144,13 +172,29 @@ const SubHunt = () => {
                   <FormItem>
                     <FormLabel>Upload Pictures</FormLabel>
                     <FormControl>
-                      <Input
-                        type="file"
-                        id="pictures"
-                        accept="image/*"
-                        multiple
-                        onChange={(e) => field.onChange(e.target.files)}
-                      />
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          type="file"
+                          id="pictures"
+                          accept="image/*"
+                          multiple
+                          onChange={(e) => field.onChange(e.target.files)}
+                          className="h-auto file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+                        />
+                        <Button
+                          className="py-4"
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            field.onChange(undefined);
+                            // Reset the file input
+                            const fileInput = document.getElementById('pictures') as HTMLInputElement;
+                            if (fileInput) fileInput.value = '';
+                          }}
+                        >
+                          Clear
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

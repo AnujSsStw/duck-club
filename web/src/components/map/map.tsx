@@ -78,22 +78,6 @@ export default function MapComp({ form }: { form?: any }) {
       <MapControl position={ControlPosition.RIGHT_BOTTOM}>
         <CurrentLocation />
       </MapControl>
-      {/* <button
-        onClick={() => {
-          if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-              setUserLocation({
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              });
-            });
-          } else {
-            // code for legacy browsers
-          }
-        }}
-      >
-        onclik
-      </button> */}
     </APIProvider>
   );
 }

@@ -21,12 +21,16 @@ import { Loading } from "@/components/loading";
 export default function CardDemo() {
   const pathname = usePathname();
 
-  const hunt = useQuery(api.hunts.getSubHunts, {
-    id: pathname.split("/").pop() as any,
+  // const hunt = useQuery(api.hunts.getSubHunts, {
+  //   id: pathname.split("/").pop() as any,
+  // });
+  const huntExists = useQuery(api.huntsAllData.getTakenTimeSlots, {
+    huntId: pathname.split("/").pop() as any,
   });
-  if (!hunt) return <Loading />;
+  if (!huntExists) return <Loading />;
 
-  console.log(hunt);
+
+  const hunt = ["morning", "mid-day", "afternoon"];
 
   return (
     <div className="flex  w-full h-screen justify-center items-center">
@@ -39,18 +43,18 @@ export default function CardDemo() {
         </CardHeader>
         <CardContent className="grid gap-4">
           {hunt.map((h) => (
-            <Button asChild={!h?.init} disabled={h?.init} key={h?._id}>
+            <Button key={h} disabled={huntExists.includes(h)}>
               <Link
-                href={`/log/${pathname.split("/").pop()}/${h?._id}`}
+                href={`/log/${pathname.split("/").pop()}/${h}`}
                 className="uppercase"
               >
-                {h?.timeSlot}
+                {h}
               </Link>
             </Button>
           ))}
         </CardContent>
         <CardFooter className="justify-center">
-          {hunt.every((h) => h?.init) && (
+          {huntExists.length === 3 && (
             <div className="flex justify-center flex-col">
               <Link href={"/"} className="flex items-center">
                 <CheckIcon /> All Done Go to Home
