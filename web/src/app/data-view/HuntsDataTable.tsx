@@ -30,7 +30,7 @@ interface HuntsDataTableProps {
 export const HuntsDataTable: React.FC<HuntsDataTableProps> = ({ creatorId }) => {
   const huntsData = useQuery(api.huntsAllData.getHuntsByCreator, { creatorId });
 
-  const columns: ColumnDef<typeof huntsData[0]>[] = [
+  const columns: any = [
     {
       accessorKey: "date",
       header: "Date",
