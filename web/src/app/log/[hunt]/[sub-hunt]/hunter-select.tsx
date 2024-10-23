@@ -1,15 +1,14 @@
 "use client";
 
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Loader2, Search, UserPlus, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { useDebounce } from "use-debounce";
-import { Doc, Id } from "../../../../../convex/_generated/dataModel";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Id } from "../../../../../convex/_generated/dataModel";
 import { BlindsManager } from "./blinds-picker";
 import { SpeciesFieldArray } from "./waterfowlSpecies-picker";
 
@@ -59,6 +58,7 @@ export function HunterSelect({
   const [searchResults, setSearchResults] = useState<Array<Hunter>>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<Array<Hunter>>([]);
 
   const { fields, append, remove, prepend, insert } = useFieldArray({
     control: form.control,
@@ -95,14 +95,14 @@ export function HunterSelect({
         blinds: { name: "" },
         species: [],
       });
-
-      // Clear search term after adding user
+      setSelectedUsers(prevUsers => [user, ...prevUsers]);
       setSearchTerm("");
     }
   };
 
   const handleRemoveUser = (index: number) => {
     remove(index);
+    setSelectedUsers(prevUsers => prevUsers.filter((_, i) => i !== index));
   };
 
   return (
@@ -191,15 +191,15 @@ export function HunterSelect({
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex gap-2 items-center">
                       <Avatar>
-                        <AvatarImage src={searchResults.find(user => user._id === field.hunterID)?.pictureUrl} />
+                        <AvatarImage src={selectedUsers[index]?.pictureUrl} />
                         <AvatarFallback>Pic</AvatarFallback>
                       </Avatar>
                       <span>
                         <p className="font-medium">
-                          {searchResults.find(user => user._id === field.hunterID)?.fullName}
+                          {selectedUsers[index]?.fullName}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {searchResults.find(user => user._id === field.hunterID)?.email}
+                          {selectedUsers[index]?.email}
                         </p>
                       </span>
                     </div>

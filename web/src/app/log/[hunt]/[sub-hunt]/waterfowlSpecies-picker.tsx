@@ -90,6 +90,7 @@ export function SpeciesFieldArray({
                       </Button>
                     </FormControl>
                   </PopoverTrigger>
+
                   <PopoverContent className="w-full p-0">
                     <Command>
                       <CommandInput
@@ -127,6 +128,7 @@ export function SpeciesFieldArray({
                   </PopoverContent>
                 </Popover>
                 <FormMessage />
+
               </FormItem>
             )}
           />
@@ -143,11 +145,10 @@ export function SpeciesFieldArray({
                       {...field}
                       placeholder="Count"
                       className="w-full sm:w-20"
-                      min={1}
-                      max={10}
+                      min={0}
                       onChange={(e) => {
                         const value = parseInt(e.target.value);
-                        field.onChange(Math.min(Math.max(value, 1), 10));
+                        field.onChange(Math.min(Math.max(value, 0), 10));
                       }}
                     />
                   </FormControl>

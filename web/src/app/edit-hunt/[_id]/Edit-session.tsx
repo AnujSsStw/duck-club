@@ -116,9 +116,6 @@ export const SessionEdit = ({
           <Button
             type="button"
             onClick={async () => {
-              // console.log(sessions);
-
-              // return
               await updatorFunction({
                 huntId: huntId,
                 sessionId: activeSessionId!,

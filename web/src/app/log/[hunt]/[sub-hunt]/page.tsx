@@ -35,15 +35,15 @@ const FormSchema = z.object({
         hunterID: z.string(),
 
         blinds: z.object({
-          name: z.string().min(1, "Name is required"),
+          name: z.string().min(1, "Blind is required"),
         }),
 
         species: z.array(
           z.object({
             count: z.number().min(1, "Count must be at least 1"),
-            id: z.string(),
+            id: z.string().min(1, "Species is required"),
           })
-        ),
+        ).min(1, "At least one species is required"),
       })
     )
     .min(1, "At least one hunter is required"),
