@@ -18,7 +18,6 @@ import { CurrentLocation } from "./current-location";
 import { PlaceAutocompleteClassic } from "./search-place";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string;
-console.log("API_KEY", API_KEY);
 
 export default function MapComp({ form }: { form?: any }) {
   const [userLocation, setUserLocation] = React.useState({ lat: 0, lng: 0 });

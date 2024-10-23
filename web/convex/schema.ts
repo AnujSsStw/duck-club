@@ -95,6 +95,8 @@ export default defineSchema(
     huntsAllData: defineTable({
       // Hunt details
       date: v.optional(v.string()),
+
+      // Hunt location details
       locationName: v.optional(v.string()),
       locationDescription: v.optional(v.string()),
       latitude: v.optional(v.number()),
@@ -105,6 +107,8 @@ export default defineSchema(
 
       // Hunt sessions
       sessions: v.optional(v.array(v.object({
+      note: v.optional(v.string()),
+
         timeSlot: v.optional(v.union(
           v.literal("morning"),
           v.literal("mid-day"),

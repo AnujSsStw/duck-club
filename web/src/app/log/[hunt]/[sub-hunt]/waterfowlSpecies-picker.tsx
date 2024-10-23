@@ -41,17 +41,13 @@ export function SpeciesFieldArray({
     {
       hunters: {
         hunterID: string;
-        name: string;
-        email: string;
         species: {
-          name: string;
           count: number;
           id: string;
         }[];
         blinds: {
           name: string;
         };
-        pictureUrl: string;
       }[];
     },
     any
@@ -71,7 +67,7 @@ export function SpeciesFieldArray({
         <div key={field.id} className="flex flex-row items-center gap-2">
           <FormField
             control={control}
-            name={`hunters.${nestIndex}.species.${k}.name`}
+            name={`hunters.${nestIndex}.species.${k}.id`}
             render={({ field }) => (
               <FormItem className="w-full">
                 <Popover>
@@ -88,7 +84,7 @@ export function SpeciesFieldArray({
                         )}
                       >
                         {field.value
-                          ? species.find((s) => s.name === field.value)?.name
+                          ? species.find((s) => s._id === field.value)?.name
                           : "Select Species"}
                         <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
@@ -111,7 +107,6 @@ export function SpeciesFieldArray({
                                 update(k, {
                                   count: fields[k].count,
                                   id: s._id,
-                                  name: s.name,
                                 });
                               }}
                             >
@@ -119,7 +114,7 @@ export function SpeciesFieldArray({
                               <CheckIcon
                                 className={cn(
                                   "ml-auto h-4 w-4",
-                                  s.name === field.value
+                                  s._id === field.value
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
@@ -180,7 +175,7 @@ export function SpeciesFieldArray({
         variant="outline"
         size="sm"
         className="w-full sm:w-auto"
-        onClick={() => append({ name: "", count: 0, id: "" })}
+        onClick={() => append({ id: "", count: 1 })}
       >
         <Plus className="h-4 w-4 mr-2" />
         Add Species

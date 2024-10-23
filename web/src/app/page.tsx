@@ -1,36 +1,18 @@
 "use client";
 
 import { StickyHeader } from "@/components/layout/sticky-header";
+import { Loading } from "@/components/loading";
 import { Link } from "@/components/typography/link";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
-import { Loading } from "@/components/loading";
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
-  return (    
+  return (
     <>
-      <StickyHeader className="px-4 py-4">
-        <div className="flex justify-between items-center">
-          <Link href="/" className="text-2xl font-bold no-underline">
-            Duck Club App
-          </Link>
-          <div className="flex gap-4">
-            <SignInAndSignUpButtons />
-          </div>
-        </div>
-      </StickyHeader>
+
 
       <main className="container flex flex-col gap-8">
         <Authenticated>
@@ -44,7 +26,7 @@ export default function Home() {
   );
 }
 
-function SignInAndSignUpButtons() {
+export function SignInAndSignUpButtons() {
   return (
     <div className="flex gap-4">
       <Authenticated>
@@ -74,7 +56,8 @@ function SignedInContent() {
 
   return (
     <div className="w-full px-4 py-6 md:w-[90%] lg:w-[75%] mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Your Log Hunts</h2>
+      <h2 className="text-2xl font-bold mb-4">Your Added Log Hunts</h2>
+      <p className="text-sm text-gray-500 mb-4">Click on the add button to add a session.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {hunts.map((hunt) => (
           <Card key={hunt.id}>
@@ -91,7 +74,7 @@ function SignedInContent() {
             </CardContent>
             <CardFooter>
               <Button asChild className="w-full">
-                <Link href={`/log/${hunt.id}`}>View Details</Link>
+                <Link href={`/log/${hunt.id}`}>Add Session</Link>
               </Button>
             </CardFooter>
           </Card>

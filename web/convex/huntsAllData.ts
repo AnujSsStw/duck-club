@@ -1,7 +1,8 @@
 import { v } from "convex/values";
-import { internalMutation, mutation, query } from "./_generated/server";
+import { httpAction, internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 import { WeatherData } from "./fuckint_types";
+import { internal } from "./_generated/api";
 
 export const initializeHunt = internalMutation({
     args: {
@@ -42,14 +43,14 @@ export const addHuntSession = mutation({
             hunterID: v.id("hunters"),
             species: v.array(v.object({
                 id: v.id("waterfowlSpecies"),
-                name: v.string(),
                 count: v.number(),
             })),
             blinds: v.object({
                 name: v.string(),
             }),
         })),
-        weather: v.any()
+        weather: v.any(),
+        note: v.optional(v.string()),
     },
     handler: async (ctx, args) => {
         const hunt = await ctx.db.get(args.huntId);
@@ -59,6 +60,7 @@ export const addHuntSession = mutation({
 
 
         const newSession = {
+            note: args.note,
             timeSlot: args.timeSlot,
             pictures: args.pictures,
             totalWaterfowl: args.hunters.reduce(
@@ -86,10 +88,12 @@ export const addHuntSession = mutation({
                         latitude: hunt.latitude,  // Using hunt location as a placeholder
                         longitude: hunt.longitude,  // Using hunt location as a placeholder
                     },
-                    harvests: hunter.species.map(species => ({
-                        speciesId: species.id,
-                        speciesName: species.name,
-                        quantity: species.count,
+                    harvests: await Promise.all(hunter.species.map(async (species) => {
+                        const speciesData = await ctx.db.get(species.id);
+                        if (!speciesData) {
+                            throw new Error(`Species not found: ${species.id}`);
+                        }
+                        return { speciesId: species.id, speciesName: speciesData.name, quantity: species.count };
                     })),
                 };
             })),
@@ -156,53 +160,73 @@ export const getHuntsByCreator = query({
     },
 });
 
-export const getHuntDetails = query({
+export const getHuntsAllData = query({
+    args: {},
+    handler: async (ctx, args) => {
+        const hunts = await ctx.db.query("huntsAllData").collect();
+        return hunts;
+    },
+});
+
+export const getHuntDetails = httpAction(async (ctx, request) => {
+    const token = request.headers.get("Authorization");
+    if (!token) return new Response("Unauthorized", { status: 401 });
+  
+    const user = await ctx.runQuery(internal.users.getUserBy_tokenIdentifier, {
+      tokenIdentifier: token,
+    });
+    if (!user) return new Response("No user Found", { status: 401 });
+
+    const huntId = request.headers.get("huntId") as Id<"huntsAllData">;
+    const huntDetails = await ctx.runQuery(internal.huntsAllData.getHuntDetails_interanl, {huntId});
+    
+    if (!huntDetails) return new Response("Hunt not found", { status: 404 });
+    
+    return new Response(JSON.stringify(huntDetails), {
+        headers: { "Content-Type": "application/json" },
+    });
+});
+
+export const getHuntDetails2 = query({
     args: { huntId: v.id("huntsAllData") },
     handler: async (ctx, args) => {
         const hunt = await ctx.db.get(args.huntId);
         if (!hunt) {
             throw new Error("Hunt not found");
         }
+        return hunt
+    },
+});
 
-        const sessionsData = hunt.sessions?.map(session => ({
-            timeSlot: session.timeSlot,
-            totalWaterfowl: session.totalWaterfowl,
-            weatherCondition: session.weather.condition,
-            temperature: session.weather.temperatureC,
-            hunters: session.hunters?.length || 0,
-            // Add more session-specific data as needed
-        })) || [];
+export const getHuntDetails_interanl = internalQuery({
+    args: { huntId: v.id("huntsAllData") },
+    handler: async (ctx, args) => {
+        return await ctx.db.get(args.huntId);
+    },
+});
 
-        const speciesData = hunt.sessions?.flatMap(session =>
-            session.hunters?.flatMap(hunter =>
-                hunter.harvests?.map(harvest => ({
-                    species: harvest.speciesName,
-                    quantity: harvest.quantity,
-                })) || []
-            ) || []
-        ) || [];
+export const getHuntSessionDetails = query({
+    args: { huntId: v.id("huntsAllData"), sessionId: v.string() },
+    handler: async (ctx, args) => {
+        const hunt = await ctx.db.get(args.huntId);
+        if (!hunt) {
+            throw new Error("Hunt not found");
+        }
+        return hunt.sessions?.find(session => session.timeSlot === args.sessionId);
+    },
+});
 
-        // Aggregate species data
-        const aggregatedSpeciesData = speciesData.reduce((acc, curr) => {
-            const existing = acc.find(item => item.species === curr.species);
-            if (existing) {
-                existing.quantity += curr.quantity || 0;
-            } else {
-                acc.push({ species: curr.species || "", quantity: curr.quantity || 0 });
-            }
-            return acc;
-        }, [] as { species: string, quantity: number }[]);
-
-        return {
-            huntInfo: {
-                date: hunt.date,
-                location: `${hunt.city}, ${hunt.state}`,
-                totalSessions: hunt.sessions?.length || 0,
-                totalHarvest: hunt.sessions?.reduce((total, session) =>
-                    total + (session.totalWaterfowl || 0), 0) || 0,
-            },
-            sessionsData,
-            aggregatedSpeciesData,
-        };
+export const updateHuntSession = mutation({
+    args: {
+        huntId: v.id("huntsAllData"),
+        sessionId: v.string(),
+        sessions: v.any(),
+    },
+    handler: async (ctx, args) => {
+        
+       await ctx.db.patch(args.huntId, {
+            sessions: args.sessions
+        });
+        return "success";
     },
 });

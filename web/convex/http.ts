@@ -4,6 +4,7 @@ import { internal } from "./_generated/api";
 import type { WebhookEvent } from "@clerk/backend";
 import { Webhook } from "svix";
 import { getData } from "./queries/data";
+import { getHuntDetails } from "./huntsAllData";
 
 const http = httpRouter();
 
@@ -93,6 +94,12 @@ http.route({
   path: "/data",
   method: "GET",
   handler: getData,
+});
+
+http.route({
+  path: "/hunt-details",
+  method: "GET",
+  handler: getHuntDetails,
 });
 
 async function validateRequest(req: Request): Promise<WebhookEvent | null> {

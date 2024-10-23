@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,14 +24,14 @@ import { useState } from "react";
 import { Spinner } from "@/components/spinner";
 import { getWeatherData } from "@/lib/get-weather-data";
 import { Loading } from "@/components/loading";
+import { Textarea } from "@/components/ui/textarea";
 
 const FormSchema = z.object({
+  note: z.string().optional(),
   pictures: z.instanceof(FileList).optional(),
   hunters: z
     .array(
       z.object({
-        name: z.string(),
-        email: z.string(),
         hunterID: z.string(),
 
         blinds: z.object({
@@ -39,7 +40,6 @@ const FormSchema = z.object({
 
         species: z.array(
           z.object({
-            name: z.string().min(1, "Species is required"),
             count: z.number().min(1, "Count must be at least 1"),
             id: z.string(),
           })
@@ -54,20 +54,9 @@ const SubHunt = () => {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      hunters: [
-        // add a dummy hunter
-        {
-          name: "Sam",
-          email: "sam@gmail.com",
-          hunterID: "",
-          blinds: {
-            name: "",
-          },
-          species: [],
-        },
-      ],
+      hunters: [],
       pictures: undefined,
-    },
+    }
   });
   const generateUploadUrl = useMutation(api.upload_things.generateUploadUrl);
   const insertSubHunt = useMutation(api.subHunts.insertSubHunt);
@@ -80,7 +69,7 @@ const SubHunt = () => {
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  if (!getHuntLocation) return <Loading />;
+  if (!getHuntLocation) return <Loading />      ;
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     console.log("Sub hunt data submitted:", data);
@@ -128,12 +117,12 @@ const SubHunt = () => {
         hunterID: hunter.hunterID as Id<"hunters">,
         species: hunter.species.map((species) => ({
           id: species.id as Id<"waterfowlSpecies">,
-          name: species.name,
           count: species.count,
         })),
         blinds: hunter.blinds,
       })),
       weather: weatherData,
+      note: data.note,
     });
     // await insertSubHunt({
     //   pictures: successfulImageIds,
@@ -158,8 +147,10 @@ const SubHunt = () => {
       <h2 className="text-2xl font-bold mb-4 sm:mb-6">Log New Hunt</h2>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+          {/* @ts-ignore */}
           <HunterSelect form={form} />
 
+          {/* Pictures */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg sm:text-xl">Pictures</CardTitle>
@@ -196,6 +187,34 @@ const SubHunt = () => {
                         </Button>
                       </div>
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Notes */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg sm:text-xl">Notes</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormField
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <FormItem>
+              <FormControl>
+                <Textarea
+                  placeholder="Tell us a little bit about yourself"
+                  className="resize-none"
+                  {...field}
+                />
+                </FormControl>
+              <FormDescription>
+                Add any additional notes about the hunt.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

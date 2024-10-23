@@ -25,6 +25,7 @@ type Hunter = {
 };
 
 const fetchUsers = async (query: string): Promise<Array<Hunter>> => {
+  // TODO: remove this and add auth headers
   const users = await fetch(
     `https://gallant-ant-192.convex.site/get-user/${query}`
   );
@@ -40,17 +41,13 @@ export function HunterSelect({
     {
       hunters: {
         hunterID: string;
-        name: string;
-        email: string;
-        species: {
-          name: string;
-          count: number;
-          id: string;
-        }[];
         blinds: {
           name: string;
         };
-        pictureUrl: string;
+        species: {
+          id: string;
+          count: number;
+        }[];
       }[];
     },
     any,
@@ -94,12 +91,9 @@ export function HunterSelect({
   const handleAddUser = (user: Hunter) => {
     if (!fields.some((field) => field.hunterID === user._id)) {
       prepend({
-        email: user.email,
-        name: user.fullName,
-        blinds: { name: "" },
-        species: [{ name: "", count: 0, id: "" }],
         hunterID: user._id,
-        pictureUrl: user.pictureUrl,
+        blinds: { name: "" },
+        species: [],
       });
 
       // Clear search term after adding user
@@ -196,33 +190,17 @@ export function HunterSelect({
                   {/* basic details */}
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex gap-2 items-center">
-                      <FormField
-                        control={form.control}
-                        name={`hunters.${index}.pictureUrl`}
-                        render={({ field }) => (
-                          <Avatar>
-                            <AvatarImage src={field.value} />
-                            <AvatarFallback>Pic</AvatarFallback>
-                          </Avatar>
-                        )}
-                      />
+                      <Avatar>
+                        <AvatarImage src={searchResults.find(user => user._id === field.hunterID)?.pictureUrl} />
+                        <AvatarFallback>Pic</AvatarFallback>
+                      </Avatar>
                       <span>
-                        <FormField
-                          control={form.control}
-                          name={`hunters.${index}.name`}
-                          render={({ field }) => (
-                            <p className="font-medium">{field.value}</p>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`hunters.${index}.email`}
-                          render={({ field }) => (
-                            <p className="text-sm text-gray-500">
-                              {field.value}
-                            </p>
-                          )}
-                        />
+                        <p className="font-medium">
+                          {searchResults.find(user => user._id === field.hunterID)?.fullName}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {searchResults.find(user => user._id === field.hunterID)?.email}
+                        </p>
                       </span>
                     </div>
 

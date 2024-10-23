@@ -5,13 +5,14 @@ import { Loading } from "@/components/loading";
 import MapComp from "@/components/map/map";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAction, useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../../convex/_generated/api";
+import { Input } from "@/components/ui/input";
 
 const FormSchema = z.object({
   date: z.date({ required_error: "Start date is required" }),
@@ -52,7 +53,7 @@ const LogHunt = () => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6"
+          className="space-y-6 flex flex-col"
         >
           <Card>
             <CardHeader>
@@ -69,6 +70,8 @@ const LogHunt = () => {
                   <CalendarForm form={form} label="Date" name="date" />
                 </div>
               </div>
+
+              
             </CardContent>
           </Card>
           <Button type="submit" className="w-full sm:w-auto">Create Hunt</Button>
