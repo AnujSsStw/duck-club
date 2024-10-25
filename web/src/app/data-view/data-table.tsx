@@ -61,14 +61,13 @@ export function DataTable<TData, TValue>({
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     filterFns: {
-      filterByDateRange: filterByDateRange
+      filterByDateRange: filterByDateRange,
     },
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
-      
     },
   });
 
@@ -82,8 +81,6 @@ export function DataTable<TData, TValue>({
       }));
   }, [table]);
 
-  const isFiltered = table.getState().columnFilters.length > 0;
-
   return (
     <div>
       <DataTableToolbar
@@ -91,7 +88,6 @@ export function DataTable<TData, TValue>({
         filterableColumns={filterableColumns}
         selectedColumn={selectedColumn}
         setSelectedColumn={setSelectedColumn}
-        selectedRows={rowSelection}
       />
 
       {/* table */}
