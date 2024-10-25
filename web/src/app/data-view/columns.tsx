@@ -52,6 +52,7 @@ export function getHuntsAllDataColumns() {
          <DataTableColumnHeader column={column} title="Date" />
         );
       },
+      filterFn: "filterByDateRange" as any,
     },
    
     {

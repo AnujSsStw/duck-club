@@ -161,9 +161,11 @@ export const getHuntsByCreator = query({
 });
 
 export const getHuntsAllData = query({
-    args: {},
+    args: {
+        creatorId: v.optional(v.id("hunters")),
+    },
     handler: async (ctx, args) => {
-        const hunts = await ctx.db.query("huntsAllData").collect();
+        const hunts = await ctx.db.query("huntsAllData").withIndex("by_createdBy", (q) => q.eq("createdBy", args.creatorId)).collect();
         return hunts;
     },
 });

@@ -3,14 +3,18 @@ import { useQuery } from 'convex/react';
 import { DataTable } from './data-table';
 import { api } from '../../../convex/_generated/api';
 import { getHuntsAllDataColumns, flattenHuntsData } from './columns';
+import { Loading } from '@/components/loading';
 
 export default function Page() {
   const currentUser = useQuery(api.users.current);
-  const huntsData = useQuery(api.huntsAllData.getHuntsAllData);
+  const huntsData = useQuery(api.huntsAllData.getHuntsAllData, {
+    creatorId: currentUser?._id,
+  });
 
   const columns = getHuntsAllDataColumns();
 
-  if (!currentUser || !huntsData) return <div>Loading...</div>;
+  if (!currentUser || !huntsData) return <Loading />;
+
 
   const flattenedData = flattenHuntsData(huntsData);
 

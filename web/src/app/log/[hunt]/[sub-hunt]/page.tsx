@@ -43,7 +43,7 @@ const FormSchema = z.object({
             count: z.number().min(1, "Count must be at least 1"),
             id: z.string().min(1, "Species is required"),
           })
-        ).min(1, "At least one species is required"),
+        ), // enable to log even if no species are selected
       })
     )
     .min(1, "At least one hunter is required"),
@@ -56,7 +56,7 @@ const SubHunt = () => {
     defaultValues: {
       hunters: [],
       pictures: undefined,
-    }
+    },
   });
   const generateUploadUrl = useMutation(api.upload_things.generateUploadUrl);
   const insertSubHunt = useMutation(api.subHunts.insertSubHunt);
@@ -69,7 +69,7 @@ const SubHunt = () => {
 
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  if (!getHuntLocation) return <Loading />      ;
+  if (!getHuntLocation) return <Loading />;
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
     console.log("Sub hunt data submitted:", data);
@@ -107,7 +107,11 @@ const SubHunt = () => {
       successfulImageIds = imageIds.filter((id) => id !== null);
     }
 
-    const weatherData = await getWeatherData(getHuntLocation.date!, { lat: getHuntLocation?.latitude!, lng: getHuntLocation?.longitude! }, p[3] as "morning" | "mid-day" | "afternoon");
+    const weatherData = await getWeatherData(
+      getHuntLocation.date!,
+      { lat: getHuntLocation?.latitude!, lng: getHuntLocation?.longitude! },
+      p[3] as "morning" | "mid-day" | "afternoon"
+    );
 
     await addHuntSession({
       huntId: p[2] as Id<"huntsAllData">,
@@ -146,7 +150,10 @@ const SubHunt = () => {
     <div className="p-4 sm:p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-4 sm:mb-6">Log New Hunt</h2>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4 sm:space-y-6"
+        >
           {/* @ts-ignore */}
           <HunterSelect form={form} />
 
@@ -179,8 +186,10 @@ const SubHunt = () => {
                           onClick={() => {
                             field.onChange(undefined);
                             // Reset the file input
-                            const fileInput = document.getElementById('pictures') as HTMLInputElement;
-                            if (fileInput) fileInput.value = '';
+                            const fileInput = document.getElementById(
+                              "pictures"
+                            ) as HTMLInputElement;
+                            if (fileInput) fileInput.value = "";
                           }}
                         >
                           Clear
@@ -205,15 +214,15 @@ const SubHunt = () => {
                 name="note"
                 render={({ field }) => (
                   <FormItem>
-              <FormControl>
-                <Textarea
-                  placeholder="Tell us a little bit about yourself"
-                  className="resize-none"
-                  {...field}
-                />
-                </FormControl>
-              <FormDescription>
-                Add any additional notes about the hunt.
+                    <FormControl>
+                      <Textarea
+                        placeholder="Tell us a little bit about yourself"
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Add any additional notes about the hunt.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
