@@ -43,14 +43,11 @@ export function DataTableToolbar<TData>({
 
   const downloadCSV = () => {
     if (!table || table.getFilteredSelectedRowModel().rows.length === 0) return;
-   
 
     const selectedRows = table.getFilteredSelectedRowModel().rows;
 
     const csvContent = [
-      [
-        ...table.getAllColumns().map((c) => c.id),
-      ].join(","),
+      [...table.getAllColumns().map((c) => c.id)].join(","),
       ...selectedRows.map((r) =>
         [...Object.values(r.original as any)].join(",")
       ),

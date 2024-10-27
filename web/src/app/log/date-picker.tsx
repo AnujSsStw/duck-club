@@ -54,10 +54,13 @@ export function CalendarForm({
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
+                captionLayout="dropdown"
                 mode="single"
                 selected={field.value}
                 onSelect={field.onChange}
                 initialFocus
+                fromYear={2000}
+                toYear={new Date().getFullYear()}
               />
             </PopoverContent>
           </Popover>
