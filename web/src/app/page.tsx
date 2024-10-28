@@ -1,19 +1,18 @@
 "use client";
 
-import { StickyHeader } from "@/components/layout/sticky-header";
 import { Loading } from "@/components/loading";
 import { Link } from "@/components/typography/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { SignInButton, SignUpButton, UserButton } from "@clerk/clerk-react";
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
+import { Plus } from "lucide-react";
 import { api } from "../../convex/_generated/api";
+import { HuntingDashboard } from "./charts";
 
 export default function Home() {
   return (
     <>
-
-
       <main className="container flex flex-col gap-8">
         <Authenticated>
           <SignedInContent />
@@ -30,9 +29,6 @@ export function SignInAndSignUpButtons() {
   return (
     <div className="flex gap-4">
       <Authenticated>
-        <Button asChild className="no-underline">
-          <Link href="/log">Log</Link>
-        </Button>
         <UserButton afterSignOutUrl="#" />
       </Authenticated>
       <Unauthenticated>
@@ -55,31 +51,21 @@ function SignedInContent() {
   if (!hunts) return <Loading />;
 
   return (
-    <div className="w-full px-4 py-6 md:w-[90%] lg:w-[75%] mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Your Added Log Hunts</h2>
-      <p className="text-sm text-gray-500 mb-4">Click on the add button to add a session.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {hunts.map((hunt) => (
-          <Card key={hunt.id}>
-            <CardHeader>
-              <CardTitle className="text-lg">{hunt.location}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-500">
-                Created: {new Date(hunt.createdAt!).toLocaleDateString()}
-              </p>
-              <p className="text-sm text-gray-500">
-                Hunt Date: {new Date(hunt.date!).toDateString()}
-              </p>
-            </CardContent>
-            <CardFooter>
-              <Button asChild className="w-full">
-                <Link href={`/log/${hunt.id}`}>Add Session</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
+    <>
+      <div className="w-full px-4 py-6 md:w-[90%] lg:w-[75%] mx-auto">
+        <div className="flex flex-row justify-between items-center">
+          <h2 className="text-2xl font-bold mb-4">Your Hunts</h2>
+          <Button asChild>
+            <Link href="/q" className="no-underline">
+              <Plus className="w-4 h-4 mr-2" />
+              Create Hunt
+            </Link>
+          </Button>
+        </div>
+
+        <Separator className="my-4" />
       </div>
-    </div>
+      <HuntingDashboard />
+    </>
   );
 }

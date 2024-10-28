@@ -29,7 +29,7 @@ interface DataTableToolbarProps<TData> {
     value: string;
     label: string;
   }[];
-  selectedColumn: string;
+  selectedColumn: string | undefined;
   setSelectedColumn: (value: string) => void;
 }
 
@@ -42,7 +42,10 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   const downloadCSV = () => {
-    if (!table || table.getFilteredSelectedRowModel().rows.length === 0) return;
+    if (!table || table.getFilteredSelectedRowModel().rows.length === 0) {
+      alert("No rows selected");
+      return;
+    }
 
     const selectedRows = table.getFilteredSelectedRowModel().rows;
 
@@ -69,7 +72,10 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex items-center justify-between py-4">
       <div className="flex flex-1 items-center space-x-2">
-        <Select onValueChange={setSelectedColumn} value={selectedColumn}>
+        <Select
+          onValueChange={setSelectedColumn}
+          value={selectedColumn ? selectedColumn : undefined}
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Select a column" />
           </SelectTrigger>
@@ -82,12 +88,16 @@ export function DataTableToolbar<TData>({
           </SelectContent>
         </Select>
         <Input
-          placeholder={`Filter ${selectedColumn}...`}
+          placeholder={`Filter ${selectedColumn ?? "column"}...`}
           value={
-            (table.getColumn(selectedColumn)?.getFilterValue() as string) ?? ""
+            (table
+              .getColumn(selectedColumn ?? "")
+              ?.getFilterValue() as string) ?? ""
           }
           onChange={(event) =>
-            table.getColumn(selectedColumn)?.setFilterValue(event.target.value)
+            table
+              .getColumn(selectedColumn ?? "")
+              ?.setFilterValue(event.target.value)
           }
           className="max-w-sm ml-4"
           disabled={!selectedColumn}

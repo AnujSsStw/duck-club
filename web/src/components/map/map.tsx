@@ -16,11 +16,15 @@ import {
 import React from "react";
 import { CurrentLocation } from "./current-location";
 import { PlaceAutocompleteClassic } from "./search-place";
+import { useAction } from "convex/react";
+import { api } from "../../../convex/_generated/api";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string;
 
-export default function MapComp({ form }: { form?: any }) {
+export default function MapComp({ form, setLocationName }: { form?: any, setLocationName: (name: string) => void }) {
   const [userLocation, setUserLocation] = React.useState({ lat: 0, lng: 0 });
+  const getLocationName = useAction(api.utils.getLocationName);
+
 
   return (
     <APIProvider apiKey={API_KEY}>
@@ -40,14 +44,15 @@ export default function MapComp({ form }: { form?: any }) {
                     defaultZoom={3}
                     gestureHandling={"greedy"}
                     disableDefaultUI={true}
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       if (e.detail.latLng) {
                         field.onChange(e.detail.latLng);
                         setUserLocation(e.detail.latLng);
+                        const locationName = await getLocationName({ location: e.detail.latLng });
+                        setLocationName(locationName.description);
                       }
                     }}
                   />
-                  {/* <AdvancedMarker position={userLocation} /> */}
                 </>
               </FormControl>
               <FormMessage />
@@ -59,7 +64,6 @@ export default function MapComp({ form }: { form?: any }) {
       {userLocation.lat !== 0 && userLocation.lng !== 0 && (
         <Marker position={userLocation} />
       )}
-      {/* <InputMarker p={userLocation} /> */}
       <MapControl position={ControlPosition.TOP}>
         <div className="autocomplete-control mt-4">
           <PlaceAutocompleteClassic

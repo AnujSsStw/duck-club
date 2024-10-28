@@ -8,11 +8,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { Badge } from "@/components/ui/badge";
+import { HuntData } from "./more-types";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export function getHuntsAllDataColumns() {
-  const columns: ColumnDef<ReturnType<typeof flattenHuntsData>[number]>[] = [
+  const columns: ColumnDef<ReturnType<typeof flattenHuntsData2>[number]>[] = [
     {
       id: "id",
       accessorKey: "_id",
@@ -21,16 +22,23 @@ export function getHuntsAllDataColumns() {
       enableSorting: false,
       enableColumnFilter: false,
       enableGlobalFilter: false,
-      },
+    },
+    {
+      id: "blindSessionId",
+      accessorKey: "blindSessionId",
+      header: "Blind Session ID",
+      enableHiding: false,
+      enableSorting: false,
+      enableColumnFilter: false,
+      enableGlobalFilter: false,
+    },
     {
       id: "select",
       header: ({ table }) => (
         <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
-          }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          // select all rows
+          checked={table.getIsAllPageRowsSelected()}
+          onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
           aria-label="Select all"
           className="mr-2"
         />
@@ -48,37 +56,29 @@ export function getHuntsAllDataColumns() {
     {
       accessorKey: "date",
       header: ({ column }) => {
-        return (
-         <DataTableColumnHeader column={column} title="Date" />
-        );
+        return <DataTableColumnHeader column={column} title="Date" />;
       },
       filterFn: "filterByDateRange" as any,
     },
-   
     {
       accessorKey: "location",
       header: "Location",
     },
     {
-      accessorKey: "state",
-      header: "State",
-    },
-    {
-      accessorKey: "county",
-      header: "County",
-    },
-    {
-      accessorKey: "city",
-      header: "City",
-    },
-    {
       accessorKey: "timeSlot",
       header: "Time Slot",
+      cell: ({ row }) => {
+        return <div className="capitalize">{row.original.timeSlot}</div>;
+      },
     },
     {
-      accessorKey: "totalWaterfowl",
+      accessorKey: "blind",
+      header: "Blind",
+    },
+    {
+      accessorKey: "totalBirds",
       header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Total Waterfowl" />
+        <DataTableColumnHeader column={column} title="Total Birds" />
       ),
     },
     {
@@ -88,54 +88,55 @@ export function getHuntsAllDataColumns() {
       ),
     },
     {
-      accessorKey: "temp",
+      accessorKey: "temperature",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Temperature" />
       ),
+      cell: ({ row }) => {
+        return <div>{row.original.temperature}°F</div>;
+      },
     },
     {
-      accessorKey: "wind",
+      accessorKey: "windSpeed",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Wind" />
       ),
-    },
-    {
-      accessorKey: "hunterName",
-      header: ({ column }) => {
-        return (
-          <DataTableColumnHeader column={column} title="Hunter Name" />
-        );
-      },
       cell: ({ row }) => {
-        const label = ["guest", "member"].find((label) => label === row.original.memberType)
-  
-        return (
-          <div className="flex space-x-2">
-            {label && <Badge variant="outline">{label}</Badge>}
-            <span className="max-w-[500px] truncate font-medium">
-              {row.getValue("hunterName")}
-            </span>
-          </div>
-        )
+        return <div>{row.original.windSpeed} mph</div>;
       },
     },
     {
-      accessorKey: "email",
-      header: "Email",
+      accessorKey: "windDirection",
+      // header: ({ column }) => (
+      //   <DataTableColumnHeader column={column} title="Wind Direction" />
+      // ),
+      header: "Wind Direction",
     },
     {
-      accessorKey: "phone",
-      header: "Phone",
+      accessorKey: "totalHunters",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Total Hunters" />
+      ),
     },
-    // {
-    //   accessorKey: "memberType",
-    //   header: ({ column }) => (
-    //     <DataTableColumnHeader column={column} title="Membership Type" />
-    //   ),
-    // },
     {
-      accessorKey: "blind",
-      header: "Blind",
+      accessorKey: "hunters",
+      header: ({ column }) => {
+        return <DataTableColumnHeader column={column} title="Hunters Name" />;
+      },
+      // cell: ({ row }) => {
+      //   const label = ["guest", "member"].find(
+      //     (label) => label === row.original.memberType
+      //   );
+
+      //   return (
+      //     <div className="flex space-x-2">
+      //       {label && <Badge variant="outline">{label}</Badge>}
+      //       <span className="max-w-[500px] truncate font-medium">
+      //         {row.getValue("hunterName")}
+      //       </span>
+      //     </div>
+      //   );
+      // },
     },
     {
       accessorKey: "harvests",
@@ -147,12 +148,15 @@ export function getHuntsAllDataColumns() {
       id: "actions",
       cell: ({ row }) => (
         <DataTableRowActions
-          row={{
-            original: {
-              _id: row.original._id as string,
-              timeSlot: row.original.timeSlot || "",
-            },
-          } as any}
+          row={
+            {
+              original: {
+                _id: row.original._id as string,
+                timeSlot: row.original.timeSlot || "",
+                blindSessionId: row.original.blindSessionId || "",
+              },
+            } as any
+          }
         />
       ),
     },
@@ -182,7 +186,7 @@ export function flattenHuntsData(data: Doc<"huntsAllData">[]) {
 
           // Weather Info
           weather: session.weather.condition,
-          temp: `${Math.round((session.weather.temperatureC * 9/5) + 32)}°F`,
+          temp: `${Math.round((session.weather.temperatureC * 9) / 5 + 32)}°F`,
           wind: `${session.weather.windSpeed} ${session.weather.windDirection}`,
 
           // Hunter Info
@@ -204,5 +208,54 @@ export function flattenHuntsData(data: Doc<"huntsAllData">[]) {
       });
     });
   });
+  return rows;
+}
+
+export function flattenHuntsData2(combinedData: HuntData[]) {
+  const rows = combinedData.flatMap((hunt) => {
+    // Create a row for each blind session
+    return hunt.blindSessions.map((blindSession) => {
+      // Get all hunters in this blind
+      const hunterNames =
+        blindSession.hunters?.map((h) => `${h.fullName}`).join(", ") || "";
+
+      // Combine all harvests from this blind session
+      const harvestCounts: { [speciesId: string]: number } = {};
+      blindSession.harvests?.forEach((harvest) => {
+        harvestCounts[harvest.speciesId] =
+          (harvestCounts[harvest.speciesId] || 0) + harvest.quantity;
+      });
+
+      // Create harvest string using species mapping
+      const harvestString =
+        blindSession.species
+          ?.map((species) => {
+            const count = harvestCounts[species._id] || 0;
+            return count > 0 ? `${count} ${species.name}` : null;
+          })
+          .filter(Boolean)
+          .join(", ") || "No harvest";
+
+      return {
+        _id: hunt._id,
+        blindSessionId: blindSession._id,
+        date: new Date(hunt.date).toLocaleDateString(),
+        timeSlot: hunt.timeSlot,
+        hunters: hunterNames,
+        blind: blindSession.blindName || "",
+        harvests: harvestString,
+        totalBirds: blindSession.totalBirds,
+
+        location: hunt.description,
+
+        weather: hunt.condition,
+        temperature: hunt.temperatureC,
+        windSpeed: hunt.windSpeed,
+        windDirection: hunt.windDirection,
+        totalHunters: blindSession.hunters?.length || 0,
+      };
+    });
+  });
+
   return rows;
 }

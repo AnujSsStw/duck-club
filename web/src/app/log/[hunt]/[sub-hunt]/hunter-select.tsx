@@ -10,10 +10,10 @@ import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { useDebounce } from "use-debounce";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { BlindsManager } from "./blinds-picker";
-import { SpeciesFieldArray } from "./waterfowlSpecies-picker";
 
 import { GuestHunter } from "./guest-hunter";
-
+import { z } from "zod";
+import { HuntFormSchema } from "@/app/q/page";
 
 type Hunter = {
   _id: Id<"hunters">;
@@ -35,23 +35,10 @@ const fetchUsers = async (query: string): Promise<Array<Hunter>> => {
 
 export function HunterSelect({
   form,
+  nestIndex,
 }: {
-  form: UseFormReturn<
-    {
-      hunters: {
-        hunterID: string;
-        blinds: {
-          name: string;
-        };
-        species: {
-          id: string;
-          count: number;
-        }[];
-      }[];
-    },
-    any,
-    undefined
-  >;
+  form: UseFormReturn<z.infer<typeof HuntFormSchema>>;
+  nestIndex: number;
 }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
@@ -60,9 +47,9 @@ export function HunterSelect({
   const [error, setError] = useState<string | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<Array<Hunter>>([]);
 
-  const { fields, append, remove, prepend, insert } = useFieldArray({
+  const { fields, prepend, remove } = useFieldArray({
     control: form.control,
-    name: "hunters",
+    name: `blindSessions.${nestIndex}.huntersPresent`,
   });
 
   const performSearch = useCallback(async (query: string) => {
@@ -88,21 +75,19 @@ export function HunterSelect({
     performSearch(debouncedSearchTerm);
   }, [debouncedSearchTerm, performSearch]);
 
+  // when this is called, the form is automatically submitted why??
   const handleAddUser = (user: Hunter) => {
     if (!fields.some((field) => field.hunterID === user._id)) {
-      prepend({
-        hunterID: user._id,
-        blinds: { name: "" },
-        species: [],
-      });
-      setSelectedUsers(prevUsers => [user, ...prevUsers]);
+      prepend({ hunterID: user._id });
+      setSelectedUsers((prevUsers) => [user, ...prevUsers]);
       setSearchTerm("");
+      console.log("why");
     }
   };
 
   const handleRemoveUser = (index: number) => {
     remove(index);
-    setSelectedUsers(prevUsers => prevUsers.filter((_, i) => i !== index));
+    setSelectedUsers((prevUsers) => prevUsers.filter((_, i) => i !== index));
   };
 
   return (
@@ -161,10 +146,13 @@ export function HunterSelect({
                   </Avatar>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium truncate">{user.fullName}</p>
-                    <p className="text-sm text-gray-500 truncate">{user.email}</p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {user.email}
+                    </p>
                   </div>
                 </div>
                 <Button
+                  type="button"
                   onClick={() => handleAddUser(user)}
                   disabled={fields.some((field) => field.hunterID === user._id)}
                   className="w-full sm:w-auto mt-2 sm:mt-0"
@@ -185,53 +173,31 @@ export function HunterSelect({
         ) : (
           <ul className="space-y-4 ">
             {fields.map((field, index) => (
-              <Card key={field.id} className="pt-4">
-                <CardContent>
-                  {/* basic details */}
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex gap-2 items-center">
-                      <Avatar>
-                        <AvatarImage src={selectedUsers[index]?.pictureUrl} />
-                        <AvatarFallback>Pic</AvatarFallback>
-                      </Avatar>
-                      <span>
-                        <p className="font-medium">
-                          {selectedUsers[index]?.fullName}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {selectedUsers[index]?.email}
-                        </p>
-                      </span>
-                    </div>
+              // basic details
+              <div
+                key={field.id}
+                className="flex items-center justify-between mb-2"
+              >
+                <div className="flex gap-2 items-center">
+                  <Avatar>
+                    <AvatarImage src={selectedUsers[index]?.pictureUrl} />
+                    <AvatarFallback>Pic</AvatarFallback>
+                  </Avatar>
+                  <span>
+                    <p className="font-medium">
+                      {selectedUsers[index]?.fullName}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {selectedUsers[index]?.email}
+                    </p>
+                  </span>
+                </div>
 
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleRemoveUser(index)}
-                    >
-                      <X className="h-4 w-4" />
-                      <span className="sr-only">Remove user</span>
-                    </Button>
-                  </div>
-
-                  {/* blinds */}
-                  <div>
-                    <BlindsManager
-                      field={field}
-                      index={index}
-                      remove={remove}
-                      form={form}
-                    />
-                  </div>
-
-                  {/* species */}
-                  <div>
-                    <SpeciesFieldArray
-                      nestIndex={index}
-                      control={form.control}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
+                <Button variant="ghost" onClick={() => handleRemoveUser(index)}>
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Remove user</span>
+                </Button>
+              </div>
             ))}
           </ul>
         )}

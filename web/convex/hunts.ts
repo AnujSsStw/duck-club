@@ -3,6 +3,7 @@ import { Id } from "./_generated/dataModel";
 import { action, internalMutation, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
 import { WeatherData } from "./fuckint_types";
+import { extractLocationData } from "./utils";
 
 export const getSubHunts = query({
   args: { id: v.id("hunts") },
@@ -63,7 +64,10 @@ export const addHunt = action({
     creatorID: v.id("hunters"),
     location: v.object({ lat: v.number(), lng: v.number() }),
   },
-  handler: async (ctx, args): Promise<{  noSql_huntsId: Id<"huntsAllData"> }> => {
+  handler: async (
+    ctx,
+    args
+  ): Promise<{ noSql_huntsId: Id<"huntsAllData"> }> => {
     const location = await fetch(
       `https://maps.googleapis.com/maps/api/geocode/json?latlng=${args.location.lat},${args.location.lng}&key=${process.env.GOOGLE_MAPS_API}`
     );
@@ -100,11 +104,14 @@ export const addHunt = action({
     // }
 
     // for new table
-    const noSql_huntsId = await ctx.runMutation(internal.huntsAllData.initializeHunt, {
-      createdBy: args.creatorID,
-      date: args.date,
-      locationId: locationId
-    })
+    const noSql_huntsId = await ctx.runMutation(
+      internal.huntsAllData.initializeHunt,
+      {
+        createdBy: args.creatorID,
+        date: args.date,
+        locationId: locationId,
+      }
+    );
 
     // const d = await ctx.runMutation(internal.hunts.insertHuntData, {
     //   subHunts,
@@ -114,110 +121,7 @@ export const addHunt = action({
     // });
     return {
       // huntsId: d,
-      noSql_huntsId: noSql_huntsId
-    }
+      noSql_huntsId: noSql_huntsId,
+    };
   },
 });
-
-// insert data into weatherConditions
-export const insertWeatherData = internalMutation({
-  args: {
-    locationID: v.id("huntLocations"),
-    Weather_data: v.any(), // type of this is WeatherData
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.insert("weatherConditions", {
-      dt: args.Weather_data.time,
-      locationID: args.locationID,
-      temperatureC: args.Weather_data.temp_c,
-      windDirection: args.Weather_data.wind_dir,
-      windSpeed: args.Weather_data.wind_kph,
-      precipitation: args.Weather_data.precip_mm,
-      condition: args.Weather_data.condition.text,
-      humidity: args.Weather_data.humidity,
-      visibility: args.Weather_data.vis_km,
-      uvIndex: args.Weather_data.uv,
-      source: "weatherapi.com",
-    });
-  },
-});
-
-// insert data into hunt
-export const insertHuntData = internalMutation({
-  args: {
-    subHunts: v.array(v.id("subHunts")),
-    creatorID: v.id("hunters"),
-    date: v.string(),
-    locationID: v.id("huntLocations"),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.insert("hunts", {
-      createdBy: args.creatorID,
-      subHunts: args.subHunts,
-      date: args.date,
-      locationID: args.locationID,
-    });
-  },
-});
-
-//insert data into subHunt
-export const insertsubHuntData = internalMutation({
-  args: {
-    timeSlot: v.string(),
-    weatherId: v.optional(v.id("weatherConditions")),
-  },
-  handler: async (ctx, args) => {
-    return await ctx.db.insert("subHunts", {
-      timeSlot: args.timeSlot as any,
-      init: false,
-      weatherConditionID: args.weatherId,
-    });
-  },
-});
-
-// insert data into huntLocations
-export const insertLocationData = internalMutation({
-  args: { data: v.any() },
-  handler: async (ctx, { data }) => {
-    // console.log("Location data:", args.data);
-    const extractedData = extractLocationData(data);
-    return await ctx.db.insert("huntLocations", extractedData);
-  },
-});
-
-export function extractLocationData(data: { results: any[] }) {
-  // Find the result with the most detailed information
-  const detailedResult = data.results.reduce(
-    (
-      prev: { address_components: string | any[] },
-      current: { address_components: string | any[] }
-    ) =>
-      current.address_components.length > prev.address_components.length
-        ? current
-        : prev
-  );
-
-  const getAddressComponent = (types: any[]) => {
-    return (
-      detailedResult.address_components.find(
-        (component: { types: string | any[] }) =>
-          types.some((type: any) => component.types.includes(type))
-      )?.long_name || ""
-    );
-  };
-
-  return {
-    name: getAddressComponent(["route"]) || "Unnamed Location",
-    description: detailedResult.formatted_address,
-    latitude: detailedResult.geometry.location.lat,
-    longitude: detailedResult.geometry.location.lng,
-    state: getAddressComponent(["administrative_area_level_1"]),
-    county: getAddressComponent(["country"]),
-    city: getAddressComponent([
-      "locality",
-      "administrative_area_level_2",
-      "administrative_area_level_3",
-    ]),
-  };
-}
-

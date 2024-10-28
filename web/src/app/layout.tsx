@@ -5,6 +5,10 @@ import { ConvexClientProvider } from "./ConvexClientProvider";
 import { StickyHeader } from "@/components/layout/sticky-header";
 import Link from "next/link";
 import { SignInAndSignUpButtons } from "./page";
+import { Book } from "lucide-react";
+import { headers } from "next/headers";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,15 +29,28 @@ export default function RootLayout({
           <StickyHeader className="px-4 py-4">
             <div className="flex justify-between items-center">
               <div className="flex flex-row gap-4 items-center">
+                <Book className="w-6 h-6" />
                 <Link href="/" className="text-2xl font-bold no-underline">
                   Kill Book
                 </Link>
-                <Link
-                  href="/data-view"
-                  className="text-md text-gray-500 no-underline"
-                >
-                  Data View
-                </Link>
+                <nav className="flex flex-row gap-2 items-center">
+                  <Button asChild variant="ghost">
+                    <Link
+                      href="/data-view"
+                      className={cn("no-underline", "text-blue-500")}
+                    >
+                      Explore
+                    </Link>
+                  </Button>
+                  <Button asChild variant="ghost">
+                    <Link
+                      href="/gallery"
+                      className="no-underline text-blue-500"
+                    >
+                      Gallery
+                    </Link>
+                  </Button>
+                </nav>
               </div>
 
               <div className="flex gap-4">

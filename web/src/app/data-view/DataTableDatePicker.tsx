@@ -56,7 +56,7 @@ export function DataTableDatePicker({
             id="date"
             variant={"outline"}
             className={cn(
-              "w-[300px] justify-start text-left font-normal",
+              "justify-start text-left font-normal",
               !date && "text-muted-foreground"
             )}
           >

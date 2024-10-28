@@ -7,6 +7,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import {
   Popover,
@@ -39,7 +40,7 @@ export function CalendarForm({
                 <Button
                   variant={"outline"}
                   className={cn(
-                    "w-[240px] pl-3 text-left font-normal",
+                    "w-full pl-3 text-left font-normal",
                     !field.value && "text-muted-foreground"
                   )}
                 >
@@ -59,11 +60,12 @@ export function CalendarForm({
                 selected={field.value}
                 onSelect={field.onChange}
                 initialFocus
-                fromYear={2000}
+                fromYear={2010}
                 toYear={new Date().getFullYear()}
               />
             </PopoverContent>
           </Popover>
+          <FormMessage />
         </FormItem>
       )}
     />

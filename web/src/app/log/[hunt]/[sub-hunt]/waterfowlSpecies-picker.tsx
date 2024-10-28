@@ -27,47 +27,49 @@ import {
 // import { species } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { Plus, Trash2 } from "lucide-react";
-import { Control, useFieldArray } from "react-hook-form";
+import { Control, useFieldArray, UseFormReturn } from "react-hook-form";
 import { useQuery } from "convex/react";
 import { Loading } from "@/components/loading";
 import { api } from "../../../../../convex/_generated/api";
+import { z } from "zod";
+import { HuntFormSchema } from "@/app/q/page";
 
-export function SpeciesFieldArray({
+export function HarvestSpeciesPicker({
   nestIndex,
-  control,
+  form,
 }: {
+  form: UseFormReturn<z.infer<typeof HuntFormSchema>>;
   nestIndex: number;
-  control: Control<
-    {
-      hunters: {
-        hunterID: string;
-        species: {
-          count: number;
-          id: string;
-        }[];
-        blinds: {
-          name: string;
-        };
-      }[];
-    },
-    any
-  >;
 }) {
   const species = useQuery(api.queries.species.getWaterfowlSpecies);
 
   const { fields, append, remove, update } = useFieldArray({
-    control,
-    name: `hunters.${nestIndex}.species`,
+    control: form.control,
+    name: `blindSessions.${nestIndex}.harvests`,
   });
 
   if (!species) return <Loading />;
   return (
     <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <label className="text-sm font-medium">Harvests</label>
+        <Button
+          type="button"
+          variant="link"
+          size="sm"
+          className="text-sm text-blue-600 hover:text-blue-800"
+          onClick={() => append({ speciesId: "", quantity: 1 })}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add Species
+        </Button>
+      </div>
+
       {fields.map((field, k) => (
         <div key={field.id} className="flex flex-row items-center gap-2">
           <FormField
-            control={control}
-            name={`hunters.${nestIndex}.species.${k}.id`}
+            control={form.control}
+            name={`blindSessions.${nestIndex}.harvests.${k}.speciesId`}
             render={({ field }) => (
               <FormItem className="w-full">
                 <Popover>
@@ -106,8 +108,8 @@ export function SpeciesFieldArray({
                               key={s._id}
                               onSelect={() => {
                                 update(k, {
-                                  count: fields[k].count,
-                                  id: s._id,
+                                  speciesId: s._id,
+                                  quantity: fields[k].quantity,
                                 });
                               }}
                             >
@@ -128,15 +130,14 @@ export function SpeciesFieldArray({
                   </PopoverContent>
                 </Popover>
                 <FormMessage />
-
               </FormItem>
             )}
           />
 
           <div className="flex items-center space-x-2 w-full sm:w-auto">
             <FormField
-              control={control}
-              name={`hunters.${nestIndex}.species.${k}.count`}
+              control={form.control}
+              name={`blindSessions.${nestIndex}.harvests.${k}.quantity`}
               render={({ field }) => (
                 <FormItem className="flex-grow sm:flex-grow-0">
                   <FormControl>
@@ -170,17 +171,6 @@ export function SpeciesFieldArray({
           </div>
         </div>
       ))}
-
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        className="w-full sm:w-auto"
-        onClick={() => append({ id: "", count: 1 })}
-      >
-        <Plus className="h-4 w-4 mr-2" />
-        Add Species
-      </Button>
     </div>
   );
 }
