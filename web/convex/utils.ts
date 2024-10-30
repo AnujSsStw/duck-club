@@ -2,6 +2,8 @@ import { v } from "convex/values";
 import { action, query } from "./_generated/server";
 import { WeatherData } from "./fuckint_types";
 
+export const timePeriods = ["day", "week", "month", "season", "allTime"];
+
 export const getUserRecentLocations = query({
   args: {
     hunterId: v.optional(v.id("hunters")),
@@ -40,7 +42,8 @@ export function extractLocationData(data: { results: any[] }) {
     ) =>
       current.address_components.length > prev.address_components.length
         ? current
-        : prev
+        : prev,
+    data.results[0]
   );
 
   const getAddressComponent = (types: any[]) => {
@@ -91,10 +94,10 @@ export async function getWeatherData(
   const weather = await fetch(
     `https://api.weatherapi.com/v1/history.json?key=${process.env.WEATHER_API}&q=${location.lat},${location.lng}&aqi=no&dt=${date.split("T")[0]}`
   );
-  const weatherData = (await weather.json()) as WeatherData;
+  const weatherData = (await weather.json()) as any;
   console.log(weatherData);
   const hourData = weatherData.forecast.forecastday[0].hour.find(
-    (hour) => hour.time === `${date.split("T")[0]} ${slotTime}`
+    (hour: any) => hour.time === `${date.split("T")[0]} ${slotTime}`
   );
 
   if (!hourData) {
@@ -112,6 +115,44 @@ export async function getWeatherData(
     visibility: hourData.vis_miles,
     uvIndex: hourData.uv,
     source: "weatherapi.com",
+  };
+}
+
+export async function getWeatherData2(
+  date: string,
+  location: { lat: number; lng: number },
+  slot: "morning" | "mid-day" | "afternoon"
+) {
+  const slotTime = timeSlot.find((t) => t.slot === slot)?.avgT || "12:00";
+  console.log(slotTime, date);
+
+  const res = await fetch(
+    `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${
+      location.lat
+    },${location.lng}/${date.split("T")[0]}?key=${process.env.WEATHER_API_OBS}`
+  );
+
+  const b = (await res.json()) as WeatherData;
+  console.log(b);
+  const hourData = b.days[0].hours.find(
+    (hour) => hour.datetime === `${slotTime}:00`
+  );
+
+  if (!hourData) {
+    throw new Error("Weather data not found for the specified time");
+  }
+
+  return {
+    dt: hourData.datetime,
+    temperatureF: hourData.temp,
+    windDirection: hourData.winddir,
+    windSpeed: hourData.windspeed,
+    precipitation: hourData.precip,
+    condition: hourData.conditions,
+    humidity: hourData.humidity,
+    visibility: hourData.visibility,
+    uvIndex: hourData.uvindex,
+    source: "visualcrossing",
   };
 }
 

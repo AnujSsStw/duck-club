@@ -36,13 +36,13 @@ export default defineSchema(
       dt: v.string(),
       locationID: v.id("huntLocations"),
       temperatureC: v.number(),
-      windDirection: v.string(),
+      windDirection: v.union(v.string(), v.number()), // can be string or number
       windSpeed: v.number(),
       precipitation: v.number(),
       condition: v.string(),
       humidity: v.number(),
       visibility: v.number(),
-      uvIndex: v.number(),
+      uvIndex: v.optional(v.number()),
       source: v.string(),
     }),
 

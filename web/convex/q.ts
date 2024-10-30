@@ -1,6 +1,11 @@
 import { v } from "convex/values";
 import { action, internalMutation } from "./_generated/server";
-import { extractLocationData, getLocationData, getWeatherData } from "./utils";
+import {
+  extractLocationData,
+  getLocationData,
+  getWeatherData,
+  getWeatherData2,
+} from "./utils";
 import { internal } from "./_generated/api";
 /*
 
@@ -72,21 +77,24 @@ export const i = action({
       ),
     }),
     createdBy: v.id("hunters"),
+    locationId: v.optional(v.id("huntLocations")),
   },
   handler: async (ctx, args): Promise<string> => {
-    const locationData = await getLocationData(args.huntingSession.location);
-    const locationId = await ctx.runMutation(internal.q.insertLocationData, {
-      data: locationData,
-      createdBy: args.createdBy,
-    });
+    if (!args.locationId) {
+      const locationData = await getLocationData(args.huntingSession.location);
+      args.locationId = await ctx.runMutation(internal.q.insertLocationData, {
+        data: locationData,
+        createdBy: args.createdBy,
+      });
+    }
 
-    const weatherData = await getWeatherData(
+    const weatherData = await getWeatherData2(
       args.huntingSession.date,
       args.huntingSession.location,
       args.huntingSession.timeSlot as "morning" | "mid-day" | "afternoon"
     );
     const weatherId = await ctx.runMutation(internal.q.insertWeatherData, {
-      locationID: locationId,
+      locationID: args.locationId,
       Weather_data: weatherData,
     });
 
@@ -94,7 +102,7 @@ export const i = action({
       internal.q.insertHuntingSession,
       {
         huntingSession: {
-          locationId: locationId,
+          locationId: args.locationId,
           date: args.huntingSession.date,
           timeSlot: args.huntingSession.timeSlot,
           weatherConditionID: weatherId,
@@ -190,7 +198,7 @@ export const insertWeatherData = internalMutation({
       condition: args.Weather_data.condition,
       humidity: args.Weather_data.humidity,
       visibility: args.Weather_data.visibility,
-      uvIndex: args.Weather_data.uvIndex,
+      uvIndex: args.Weather_data.uvIndex ?? undefined,
       source: "weatherapi.com",
     });
   },

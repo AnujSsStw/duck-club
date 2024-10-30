@@ -22,7 +22,6 @@ import { api } from "../../../../../convex/_generated/api";
 import { Id } from "../../../../../convex/_generated/dataModel";
 import { useState } from "react";
 import { Spinner } from "@/components/spinner";
-import { getWeatherData } from "@/lib/get-weather-data";
 import { Loading } from "@/components/loading";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -107,12 +106,7 @@ const SubHunt = () => {
       successfulImageIds = imageIds.filter((id) => id !== null);
     }
 
-    const weatherData = await getWeatherData(
-      getHuntLocation.date!,
-      { lat: getHuntLocation?.latitude!, lng: getHuntLocation?.longitude! },
-      p[3] as "morning" | "mid-day" | "afternoon"
-    );
-
+    const weatherData = "";
     await addHuntSession({
       huntId: p[2] as Id<"huntsAllData">,
       timeSlot: p[3] as "morning" | "mid-day" | "afternoon",

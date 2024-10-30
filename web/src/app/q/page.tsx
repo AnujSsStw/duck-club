@@ -83,6 +83,9 @@ const HuntEntryForm = () => {
   const recentLocations = useQuery(api.utils.getUserRecentLocations, {
     hunterId: user?._id,
   });
+  const [locationId, setLocationId] = useState<Id<"huntLocations"> | undefined>(
+    undefined
+  );
 
   const router = useRouter();
 
@@ -92,6 +95,7 @@ const HuntEntryForm = () => {
       lng: location.longitude,
     });
     setLocationName(location.description);
+    setLocationId(location._id);
   };
 
   const handleSubmit = async () => {
@@ -112,30 +116,36 @@ const HuntEntryForm = () => {
       blindSession.pictures = successfulImageIds as any;
     }
 
-    const res = await insertHuntingSession({
-      createdBy: user?._id,
-      huntingSession: {
-        date: form.getValues().date.toISOString(),
-        location: form.getValues().location,
-        timeSlot: form.getValues().timeSlot as any,
-        blindSessions: form.getValues().blindSessions.map((blindSession) => ({
-          blindId: blindSession.blindId,
-          huntersPresent: blindSession.huntersPresent.map(
-            (hunter) => hunter.hunterID as Id<"hunters">
-          ),
-          harvests: blindSession.harvests.map((harvest) => ({
-            speciesId: harvest.speciesId as Id<"waterfowlSpecies">,
-            quantity: harvest.quantity,
+    try {
+      const res = await insertHuntingSession({
+        createdBy: user?._id,
+        huntingSession: {
+          date: form.getValues().date.toISOString(),
+          location: form.getValues().location,
+          timeSlot: form.getValues().timeSlot as any,
+          blindSessions: form.getValues().blindSessions.map((blindSession) => ({
+            blindId: blindSession.blindId,
+            huntersPresent: blindSession.huntersPresent.map(
+              (hunter) => hunter.hunterID as Id<"hunters">
+            ),
+            harvests: blindSession.harvests.map((harvest) => ({
+              speciesId: harvest.speciesId as Id<"waterfowlSpecies">,
+              quantity: harvest.quantity,
+            })),
+            notes: blindSession.notes,
+            pictures: blindSession.pictures as any,
           })),
-          notes: blindSession.notes,
-          pictures: blindSession.pictures as any,
-        })),
-      },
-    });
+        },
+        locationId: locationId,
+      });
 
-    setLoading(false);
-    if (res) {
-      router.push(`/`);
+      setLoading(false);
+      if (res) {
+        router.push(`/`);
+      }
+    } catch (error) {
+      console.log(error);
+      setLoading(false);
     }
   };
 

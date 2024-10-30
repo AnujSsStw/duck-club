@@ -54,6 +54,7 @@ export function getHuntsAllDataColumns() {
       enableHiding: false,
     },
     {
+      id: "date",
       accessorKey: "date",
       header: ({ column }) => {
         return <DataTableColumnHeader column={column} title="Date" />;
@@ -61,10 +62,12 @@ export function getHuntsAllDataColumns() {
       filterFn: "filterByDateRange" as any,
     },
     {
+      id: "location",
       accessorKey: "location",
       header: "Location",
     },
     {
+      id: "timeSlot",
       accessorKey: "timeSlot",
       header: "Time Slot",
       cell: ({ row }) => {
@@ -72,10 +75,12 @@ export function getHuntsAllDataColumns() {
       },
     },
     {
+      id: "blind",
       accessorKey: "blind",
       header: "Blind",
     },
     {
+      id: "totalBirds",
       accessorKey: "totalBirds",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Total Birds" />
@@ -111,6 +116,15 @@ export function getHuntsAllDataColumns() {
       //   <DataTableColumnHeader column={column} title="Wind Direction" />
       // ),
       header: "Wind Direction",
+      cell: ({ row }) => {
+        return (
+          <div>
+            {typeof row.original.windDirection === "number"
+              ? row.original.windDirection + "°"
+              : row.original.windDirection}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "totalHunters",
