@@ -1,5 +1,10 @@
 import { v } from "convex/values";
-import { action, internalMutation } from "./_generated/server";
+import {
+  action,
+  internalMutation,
+  internalQuery,
+  mutation,
+} from "./_generated/server";
 import {
   extractLocationData,
   getLocationData,
@@ -7,6 +12,7 @@ import {
   getWeatherData2,
 } from "./utils";
 import { internal } from "./_generated/api";
+import exp from "constants";
 /*
 
 export const HuntFormSchema = z.object({
@@ -64,6 +70,12 @@ export const i = action({
       blindSessions: v.array(
         v.object({
           blindId: v.string(),
+          blindLocation: v.optional(
+            v.object({
+              lat: v.number(),
+              lng: v.number(),
+            })
+          ),
           huntersPresent: v.array(v.id("hunters")),
           harvests: v.array(
             v.object({
@@ -87,6 +99,19 @@ export const i = action({
         createdBy: args.createdBy,
       });
     }
+
+    await Promise.all(
+      args.huntingSession.blindSessions.map((blindSession) =>
+        ctx.runMutation(internal.q.insertBlind, {
+          blind: {
+            name: blindSession.blindId,
+            latitude: blindSession.blindLocation?.lat ?? 0,
+            longitude: blindSession.blindLocation?.lng ?? 0,
+            huntLocationId: args.locationId,
+          },
+        })
+      )
+    );
 
     const weatherData = await getWeatherData2(
       args.huntingSession.date,
@@ -155,6 +180,14 @@ export const i = action({
   },
 });
 
+// insert data into duckblinds
+export const insertBlind = internalMutation({
+  args: { blind: v.any() },
+  handler: async (ctx, args) => {
+    return await ctx.db.insert("duckBlinds", args.blind);
+  },
+});
+
 // insert data into images
 export const insertImage = internalMutation({
   args: { image: v.any() },
@@ -213,5 +246,48 @@ export const insertLocationData = internalMutation({
       ...extractedData,
       createdBy: createdBy,
     });
+  },
+});
+
+export const getHuntSessionDetails = internalQuery({
+  args: {
+    huntId: v.id("huntingSessions"),
+  },
+  handler: async (ctx, args) => {
+    const hunt = await ctx.db.get(args.huntId);
+    if (!hunt) {
+      throw new Error("Hunt not found");
+    }
+
+    const weather = await ctx.db.get(hunt.weatherConditionID);
+    const location = await ctx.db.get(hunt.locationId);
+    const timeSlot = hunt.timeSlot;
+    const blindSessions = await ctx.db
+      .query("blindSessions")
+      .withIndex("by_hunting_session", (q) =>
+        q.eq("huntingSessionId", args.huntId)
+      )
+      .collect();
+
+    const hunters = await Promise.all(
+      blindSessions.flatMap((blindSession) => blindSession.huntersPresent)
+    );
+
+    const harvests = await Promise.all(
+      blindSessions.flatMap((blindSession) => blindSession.harvests)
+    );
+
+    if (!hunters || !weather || !location) {
+      throw new Error("Hunters, Weather, or Location not found");
+    }
+
+    return { weather, location, timeSlot, hunters, blindSessions, harvests };
+  },
+});
+
+export const deleteSession = mutation({
+  args: { sessionId: v.id("blindSessions") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.sessionId);
   },
 });

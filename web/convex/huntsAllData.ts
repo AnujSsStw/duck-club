@@ -209,11 +209,10 @@ export const getHuntDetails = httpAction(async (ctx, request) => {
   });
   if (!user) return new Response("No user Found", { status: 401 });
 
-  const huntId = request.headers.get("huntId") as Id<"huntsAllData">;
-  const huntDetails = await ctx.runQuery(
-    internal.huntsAllData.getHuntDetails_interanl,
-    { huntId }
-  );
+  const huntId = request.headers.get("huntId") as Id<"huntingSessions">;
+  const huntDetails = await ctx.runQuery(internal.q.getHuntSessionDetails, {
+    huntId,
+  });
 
   if (!huntDetails) return new Response("Hunt not found", { status: 404 });
 

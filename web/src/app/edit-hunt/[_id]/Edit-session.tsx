@@ -36,15 +36,18 @@ import { species } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
+import { getHuntSessionDetails } from "../../../../convex/q";
+
+type UnwrapPromise<T> = T extends Promise<infer U> ? U : T;
 
 export const SessionEdit = ({
   huntId,
   huntDetails,
 }: {
-  huntId: Id<"huntsAllData">;
-  huntDetails: Doc<"huntsAllData">;
+  huntId: Id<"huntingSessions">;
+  huntDetails: UnwrapPromise<ReturnType<typeof getHuntSessionDetails>>;
 }) => {
-  const [sessions, setSessions] = React.useState(huntDetails.sessions);
+  const [sessions, setSessions] = React.useState(huntDetails.blindSessions);
   const [activeTimeSlot, setActiveTimeSlot] = React.useState(
     huntDetails.sessions?.[0]?.timeSlot
   );
@@ -139,13 +142,13 @@ export const SessionEdit = ({
         className="w-full"
       >
         <TabsList className="grid w-full grid-cols-3">
-          {["morning", "mid-day", "afternoon"].map((timeSlot) => (
+          {huntDetails.blindSessions.map((v) => (
             <TabsTrigger
-              key={timeSlot}
-              value={timeSlot}
-              disabled={!sessions?.some((s: any) => s.timeSlot === timeSlot)}
+              key={v._id}
+              value={v.blindName}
+              disabled={!sessions?.some((s: any) => s.timeSlot === "morning")}
             >
-              {getTimeSlotIcon(timeSlot)} {timeSlot}
+              {/* {getTimeSlotIcon(timeSlot)} {timeSlot} */}
             </TabsTrigger>
           ))}
         </TabsList>

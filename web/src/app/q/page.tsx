@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { History, MapPin } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { CalendarForm } from "../log/date-picker";
@@ -43,6 +43,7 @@ import { api } from "../../../convex/_generated/api";
 import { uploadImages } from "./upload-images";
 import { Doc, Id } from "../../../convex/_generated/dataModel";
 import { HuntFormSchema, HuntFormValues } from "./hunt-form-schema";
+
 const RecentLocations = ({
   recentLocations,
   selectLocation,
@@ -105,8 +106,7 @@ const HuntEntryForm = () => {
       return;
     }
     setLoading(true);
-    // return;
-    // Add your submission logic here
+
     // loop through the blind sessions and upload the images and get the ids
     for (const blindSession of form.getValues().blindSessions) {
       const successfulImageIds = await uploadImages(
@@ -253,7 +253,14 @@ const HuntEntryForm = () => {
 
         {/* Blind Sessions */}
 
-        <BlindSessions form={form} />
+        <BlindSessions
+          form={form}
+          Rlocation={recentLocations?.find(
+            (location) =>
+              location.latitude === form.getValues("location.lat") &&
+              location.longitude === form.getValues("location.lng")
+          )}
+        />
 
         {/* Submit Button */}
         <div className="flex justify-end">

@@ -21,10 +21,17 @@ import { api } from "../../../convex/_generated/api";
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY as string;
 
-export default function MapComp({ form, setLocationName }: { form?: any, setLocationName: (name: string) => void }) {
+export default function MapComp({
+  form,
+  setLocationName,
+  isLocationRequired = true,
+}: {
+  form?: any;
+  setLocationName: any;
+  isLocationRequired?: boolean;
+}) {
   const [userLocation, setUserLocation] = React.useState({ lat: 0, lng: 0 });
   const getLocationName = useAction(api.utils.getLocationName);
-
 
   return (
     <APIProvider apiKey={API_KEY}>
@@ -48,8 +55,16 @@ export default function MapComp({ form, setLocationName }: { form?: any, setLoca
                       if (e.detail.latLng) {
                         field.onChange(e.detail.latLng);
                         setUserLocation(e.detail.latLng);
-                        const locationName = await getLocationName({ location: e.detail.latLng });
-                        setLocationName(locationName.description);
+                        if (isLocationRequired) {
+                          const locationName = await getLocationName({
+                            location: e.detail.latLng,
+                          });
+                          setLocationName(locationName.description);
+                        } else {
+                          setLocationName(
+                            `Lat: ${e.detail.latLng.lat.toPrecision(3)}, Lng: ${e.detail.latLng.lng.toPrecision(3)}`
+                          );
+                        }
                       }
                     }}
                   />

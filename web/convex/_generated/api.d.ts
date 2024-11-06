@@ -15,6 +15,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as blinds from "../blinds.js";
 import type * as charts from "../charts.js";
 import type * as data_view from "../data_view.js";
 import type * as fuckint_types from "../fuckint_types.js";
@@ -40,6 +41,7 @@ import type * as utils from "../utils.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  blinds: typeof blinds;
   charts: typeof charts;
   data_view: typeof data_view;
   fuckint_types: typeof fuckint_types;

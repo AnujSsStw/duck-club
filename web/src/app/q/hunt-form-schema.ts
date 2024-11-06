@@ -17,6 +17,12 @@ export const HuntFormSchema = z.object({
     .array(
       z.object({
         blindId: z.string({ required_error: "Blind is required" }),
+        blindLocation: z.optional(
+          z.object({
+            lat: z.number(),
+            lng: z.number(),
+          })
+        ),
         huntersPresent: z
           .array(
             z.object({

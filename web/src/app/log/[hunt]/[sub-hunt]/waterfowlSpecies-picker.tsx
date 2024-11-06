@@ -15,7 +15,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -24,21 +23,19 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-// import { species } from "@/lib/constants";
-import { cn } from "@/lib/utils";
-import { Plus, Trash2 } from "lucide-react";
-import { Control, useFieldArray, UseFormReturn } from "react-hook-form";
-import { useQuery } from "convex/react";
+import { HuntFormValues } from "@/app/q/hunt-form-schema";
 import { Loading } from "@/components/loading";
+import { cn } from "@/lib/utils";
+import { useQuery } from "convex/react";
+import { Plus, Trash2 } from "lucide-react";
+import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { api } from "../../../../../convex/_generated/api";
-import { z } from "zod";
-import { HuntFormSchema } from "@/app/q/page";
 
 export function HarvestSpeciesPicker({
   nestIndex,
   form,
 }: {
-  form: UseFormReturn<z.infer<typeof HuntFormSchema>>;
+  form: UseFormReturn<HuntFormValues>;
   nestIndex: number;
 }) {
   const species = useQuery(api.queries.species.getWaterfowlSpecies);
@@ -58,7 +55,9 @@ export function HarvestSpeciesPicker({
           variant="link"
           size="sm"
           className="text-sm text-blue-600 hover:text-blue-800"
-          onClick={() => append({ speciesId: "", quantity: 1 })}
+          onClick={() =>
+            append({ speciesId: "", quantity: 1 }, { shouldFocus: true })
+          }
         >
           <Plus className="h-4 w-4 mr-2" />
           Add Species
@@ -97,7 +96,7 @@ export function HarvestSpeciesPicker({
                     <Command>
                       <CommandInput
                         placeholder="Search Species..."
-                        className="h-9"
+                        className="h-9 focus:ring-0"
                       />
                       <CommandList>
                         <CommandEmpty>No Species found.</CommandEmpty>

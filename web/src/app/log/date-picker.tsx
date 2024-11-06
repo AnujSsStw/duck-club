@@ -60,7 +60,7 @@ export function CalendarForm({
                 selected={field.value}
                 onSelect={field.onChange}
                 initialFocus
-                fromYear={2010}
+                fromYear={2000}
                 toYear={new Date().getFullYear()}
               />
             </PopoverContent>

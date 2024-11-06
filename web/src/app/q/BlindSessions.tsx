@@ -3,31 +3,25 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Plus, Trash2, Upload } from "lucide-react";
-import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { HuntFormSchema, HuntFormValues } from "./hunt-form-schema";
-import { blinds, species } from "@/lib/constants";
-import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { HarvestSpeciesPicker } from "../log/[hunt]/[sub-hunt]/waterfowlSpecies-picker";
+import { Plus, Trash2 } from "lucide-react";
+import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { HunterSelect } from "../log/[hunt]/[sub-hunt]/hunter-select";
+import { HarvestSpeciesPicker } from "../log/[hunt]/[sub-hunt]/waterfowlSpecies-picker";
+import { Blind } from "./blind";
+import { HuntFormValues } from "./hunt-form-schema";
 
 export function BlindSessions({
   form,
+  Rlocation,
 }: {
   form: UseFormReturn<HuntFormValues>;
+  Rlocation: any;
 }) {
   const { fields, append, remove, prepend, insert } = useFieldArray({
     control: form.control,
@@ -67,32 +61,8 @@ export function BlindSessions({
           </CardHeader>
 
           <CardContent className="space-y-4">
-            {/* Blind Selection */}
-            <FormField
-              control={form.control}
-              name={`blindSessions.${index}.blindId`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Blind</FormLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={(value) => field.onChange(value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select blind" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {blinds.map((blind) => (
-                        <SelectItem key={blind.name} value={blind.name}>
-                          {blind.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* Blind */}
+            <Blind form={form} nestIndex={index} Rlocation={Rlocation} />
 
             {/* Multiple Hunters Selection */}
             <div className="space-y-2">

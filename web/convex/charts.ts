@@ -1,6 +1,7 @@
 import { QueryCtx, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { format } from "date-fns";
+import { getCurrentUser } from "./users";
 
 function getDateRange(timePeriod: string) {
   if (timePeriod === "day") {
@@ -102,10 +103,13 @@ export const getDailyTotals = query({
   },
   handler: async (ctx, args) => {
     const { locationId, today } = args;
+    const user = await getCurrentUser(ctx);
+    if (!user) throw new Error("Can't get current user");
 
     // Get all hunting sessions within date range
     const sessions = await ctx.db
       .query("huntingSessions")
+      .withIndex("by_createdBy", (q) => q.eq("createdBy", user._id))
       .filter((q) =>
         q.and(
           locationId ? q.eq(q.field("locationId"), locationId) : true,
@@ -181,6 +185,8 @@ export const getSeasonalTotals = query({
   },
   handler: async (ctx, args) => {
     const { year, locationId } = args;
+    const user = await getCurrentUser(ctx);
+    if (!user) throw new Error("Can't get current user");
 
     const monthlyData = [];
     for (let i = 0; i < 12; i++) {
@@ -189,6 +195,7 @@ export const getSeasonalTotals = query({
 
       const sessions = await ctx.db
         .query("huntingSessions")
+        .withIndex("by_createdBy", (q) => q.eq("createdBy", user._id))
         .filter((q) =>
           q.and(
             locationId ? q.eq(q.field("locationId"), locationId) : true,
@@ -252,9 +259,12 @@ export const getAllTimeTotals = query({
   },
   handler: async (ctx, args) => {
     const { locationId } = args;
+    const user = await getCurrentUser(ctx);
+    if (!user) throw new Error("Can't get current user");
 
     const sessions = await ctx.db
       .query("huntingSessions")
+      .withIndex("by_createdBy", (q) => q.eq("createdBy", user._id))
       .filter((q) =>
         locationId ? q.eq(q.field("locationId"), locationId) : true
       )
@@ -332,10 +342,13 @@ export const getSpeciesBreakdown = query({
   handler: async (ctx, args) => {
     const { timePeriod, locationId } = args;
     const { startDate, endDate } = getDateRange(timePeriod);
+    const user = await getCurrentUser(ctx);
+    if (!user) throw new Error("Can't get current user");
 
     // Get all sessions in date range
     const sessions = await ctx.db
       .query("huntingSessions")
+      .withIndex("by_createdBy", (q) => q.eq("createdBy", user._id))
       .filter((q) =>
         q.and(
           startDate ? q.gte(q.field("date"), startDate) : true,
@@ -387,9 +400,13 @@ export const getBlindPerformance = query({
     const { timePeriod, locationId } = args;
     const { startDate, endDate } = getDateRange(timePeriod);
 
+    const user = await getCurrentUser(ctx);
+    if (!user) throw new Error("Can't get current user");
+
     // Get all sessions in date range
     const sessions = await ctx.db
       .query("huntingSessions")
+      .withIndex("by_createdBy", (q) => q.eq("createdBy", user._id))
       .filter((q) =>
         q.and(
           startDate ? q.gte(q.field("date"), startDate) : true,
@@ -443,10 +460,13 @@ export const getWeatherData = query({
   handler: async (ctx, args) => {
     const { timePeriod, locationId } = args;
     const { startDate, endDate } = getDateRange(timePeriod);
+    const user = await getCurrentUser(ctx);
+    if (!user) throw new Error("Can't get current user");
 
     // Get all sessions in date range
     const sessions = await ctx.db
       .query("huntingSessions")
+      .withIndex("by_createdBy", (q) => q.eq("createdBy", user._id))
       .filter((q) =>
         q.and(
           startDate ? q.gte(q.field("date"), startDate) : true,
