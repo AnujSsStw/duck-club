@@ -32,10 +32,10 @@ export function SignInAndSignUpButtons() {
         <UserButton afterSignOutUrl="#" />
       </Authenticated>
       <Unauthenticated>
-        <SignInButton mode="modal" afterSignInUrl="/">
+        <SignInButton mode="modal">
           <Button variant="ghost">Sign in</Button>
         </SignInButton>
-        <SignUpButton mode="modal" afterSignUpUrl="/">
+        <SignUpButton mode="modal">
           <Button>Sign up</Button>
         </SignUpButton>
       </Unauthenticated>

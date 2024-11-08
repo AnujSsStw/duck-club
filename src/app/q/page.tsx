@@ -43,6 +43,7 @@ import { api } from "../../../convex/_generated/api";
 import { uploadImages } from "./upload-images";
 import { Doc, Id } from "../../../convex/_generated/dataModel";
 import { HuntFormSchema, HuntFormValues } from "./hunt-form-schema";
+import { Loading } from "@/components/loading";
 
 const RecentLocations = ({
   recentLocations,
@@ -87,6 +88,7 @@ const HuntEntryForm = () => {
   const [locationId, setLocationId] = useState<Id<"huntLocations"> | undefined>(
     undefined
   );
+  const [locationName, setLocationName] = useState("");
 
   const router = useRouter();
 
@@ -148,7 +150,10 @@ const HuntEntryForm = () => {
     }
   };
 
-  const [locationName, setLocationName] = useState("");
+  if (!user) {
+    // return <Loading />;
+    return <div>Please login to save your hunt</div>;
+  }
 
   return (
     <Form {...form}>
