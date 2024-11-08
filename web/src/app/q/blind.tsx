@@ -156,9 +156,11 @@ export function Blind({
                     <SelectValue placeholder="Select recent blind" />
                   </SelectTrigger>
                   <SelectContent>
-                    {recentBlinds?.map((blind) => (
-                      <SelectItem key={blind._id} value={blind.name}>
-                        {blind.name}
+                    {Array.from(
+                      new Set(recentBlinds?.map((blind) => blind.name))
+                    ).map((name) => (
+                      <SelectItem key={name} value={name}>
+                        {name}
                       </SelectItem>
                     ))}
                   </SelectContent>
