@@ -95,7 +95,6 @@ export async function getWeatherData(
     `https://api.weatherapi.com/v1/history.json?key=${process.env.WEATHER_API}&q=${location.lat},${location.lng}&aqi=no&dt=${date.split("T")[0]}`
   );
   const weatherData = (await weather.json()) as any;
-  console.log(weatherData);
   const hourData = weatherData.forecast.forecastday[0].hour.find(
     (hour: any) => hour.time === `${date.split("T")[0]} ${slotTime}`
   );
@@ -124,7 +123,6 @@ export async function getWeatherData2(
   slot: "morning" | "mid-day" | "afternoon"
 ) {
   const slotTime = timeSlot.find((t) => t.slot === slot)?.avgT || "12:00";
-  console.log(slotTime, date);
 
   const res = await fetch(
     `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${
@@ -133,7 +131,6 @@ export async function getWeatherData2(
   );
 
   const b = (await res.json()) as WeatherData;
-  console.log(b);
   const hourData = b.days[0].hours.find(
     (hour) => hour.datetime === `${slotTime}:00`
   );

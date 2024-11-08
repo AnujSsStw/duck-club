@@ -21,16 +21,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import React, { useState } from "react";
-import { flattenHuntsData, flattenHuntsData2 } from "./columns";
+import React from "react";
+import { flattenHuntsData } from "./columns";
 import { DataTableToolbar } from "./data-table-toolbar";
-import { DataTablePagination } from "./DataTablePagination";
 import { filterByDateRange } from "./DataTableDatePicker";
+import { DataTablePagination } from "./DataTablePagination";
 
 // Update the interface to use the flattened data type
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<ReturnType<typeof flattenHuntsData2>[number]>[];
-  data: ReturnType<typeof flattenHuntsData2>;
+  columns: ColumnDef<ReturnType<typeof flattenHuntsData>[number]>[];
+  data: ReturnType<typeof flattenHuntsData>;
 }
 
 export function DataTable<TData, TValue>({
@@ -51,7 +51,6 @@ export function DataTable<TData, TValue>({
     string | undefined
   >(undefined);
 
-  // Remove the flattening here since we're now expecting pre-flattened data
   const table = useReactTable({
     data,
     columns,

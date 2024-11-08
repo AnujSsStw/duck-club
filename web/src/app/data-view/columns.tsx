@@ -1,19 +1,13 @@
-"use client";
-
-import { ColumnDef } from "@tanstack/react-table";
-import { Doc } from "../../../convex/_generated/dataModel";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { ColumnDef } from "@tanstack/react-table";
+import { get } from "../../../convex/data_view";
 import { DataTableColumnHeader } from "./DataTableColumnHeader";
 import { DataTableRowActions } from "./data-table-row-actions";
-import { Badge } from "@/components/ui/badge";
-import { HuntData } from "./more-types";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 export function getHuntsAllDataColumns() {
-  const columns: ColumnDef<ReturnType<typeof flattenHuntsData2>[number]>[] = [
+  const columns: ColumnDef<ReturnType<typeof flattenHuntsData>[number]>[] = [
     {
       id: "id",
       accessorKey: "_id",
@@ -87,12 +81,14 @@ export function getHuntsAllDataColumns() {
       ),
     },
     {
+      id: "weather",
       accessorKey: "weather",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Weather Condition" />
       ),
     },
     {
+      id: "temperature",
       accessorKey: "temperature",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Temperature" />
@@ -102,6 +98,7 @@ export function getHuntsAllDataColumns() {
       },
     },
     {
+      id: "windSpeed",
       accessorKey: "windSpeed",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Wind" />
@@ -111,6 +108,7 @@ export function getHuntsAllDataColumns() {
       },
     },
     {
+      id: "windDirection",
       accessorKey: "windDirection",
       // header: ({ column }) => (
       //   <DataTableColumnHeader column={column} title="Wind Direction" />
@@ -127,12 +125,14 @@ export function getHuntsAllDataColumns() {
       },
     },
     {
+      id: "totalHunters",
       accessorKey: "totalHunters",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Total Hunters" />
       ),
     },
     {
+      id: "hunters",
       accessorKey: "hunters",
       header: ({ column }) => {
         return <DataTableColumnHeader column={column} title="Hunters Name" />;
@@ -153,6 +153,7 @@ export function getHuntsAllDataColumns() {
       // },
     },
     {
+      id: "harvests",
       accessorKey: "harvests",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Harvest" />
@@ -179,59 +180,15 @@ export function getHuntsAllDataColumns() {
   return columns;
 }
 
-export function flattenHuntsData(data: Doc<"huntsAllData">[]) {
-  const rows = data.flatMap((hunt) => {
-    return (hunt.sessions || []).flatMap((session) => {
-      return (session.hunters || []).flatMap((hunter) => {
-        const baseRow = {
-          // Add the id field
-          _id: hunt._id,
-
-          // Hunt Info
-          date: new Date(hunt.date!).toLocaleDateString(),
-          location: hunt.locationName,
-          city: hunt.city,
-          state: hunt.state,
-          county: hunt.county,
-
-          // Session Info
-          timeSlot: session.timeSlot,
-          totalWaterfowl: session.totalWaterfowl,
-
-          // Weather Info
-          weather: session.weather.condition,
-          temp: `${Math.round((session.weather.temperatureC * 9) / 5 + 32)}°F`,
-          wind: `${session.weather.windSpeed} ${session.weather.windDirection}`,
-
-          // Hunter Info
-          hunterName: hunter.fullName,
-          email: hunter.email,
-          phone: hunter.phoneNumber,
-          memberType: hunter.memberShipType,
-
-          // Blind Info
-          blind: hunter.duckBlind?.name || "No blind",
-
-          // Harvest Info
-          harvests:
-            (hunter.harvests || [])
-              .map((h) => `${h.quantity} ${h.speciesName}`)
-              .join(", ") || "No harvest",
-        };
-        return baseRow;
-      });
-    });
-  });
-  return rows;
-}
-
-export function flattenHuntsData2(combinedData: HuntData[]) {
+export function flattenHuntsData(
+  combinedData: Awaited<ReturnType<typeof get>>
+) {
   const rows = combinedData.flatMap((hunt) => {
     // Create a row for each blind session
     return hunt.blindSessions.map((blindSession) => {
       // Get all hunters in this blind
       const hunterNames =
-        blindSession.hunters?.map((h) => `${h.fullName}`).join(", ") || "";
+        blindSession.hunters?.map((h) => `${h!.fullName}`).join(", ") || "";
 
       // Combine all harvests from this blind session
       const harvestCounts: { [speciesId: string]: number } = {};
@@ -244,8 +201,8 @@ export function flattenHuntsData2(combinedData: HuntData[]) {
       const harvestString =
         blindSession.species
           ?.map((species) => {
-            const count = harvestCounts[species._id] || 0;
-            return count > 0 ? `${count} ${species.name}` : null;
+            const count = harvestCounts[species!._id] || 0;
+            return count > 0 ? `${count} ${species!.name}` : null;
           })
           .filter(Boolean)
           .join(", ") || "No harvest";

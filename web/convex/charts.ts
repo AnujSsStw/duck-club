@@ -1,6 +1,6 @@
-import { QueryCtx, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { format } from "date-fns";
+import { query } from "./_generated/server";
 import { getCurrentUser } from "./users";
 
 function getDateRange(timePeriod: string) {

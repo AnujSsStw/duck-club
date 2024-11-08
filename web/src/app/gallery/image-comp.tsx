@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useMutation } from "convex/react";
 import { Heart, X } from "lucide-react";
 import Image from "next/image";
@@ -10,7 +15,6 @@ import { api } from "../../../convex/_generated/api";
 export function ImageComponent({ image }: { image: any }) {
   const setAsFavoriteAction = useMutation(api.upload_things.setAsFavorite);
   const [selectedImage, setSelectedImage] = useState(null);
-  console.log(image.url);
 
   return (
     <div className="relative">
@@ -22,31 +26,34 @@ export function ImageComponent({ image }: { image: any }) {
               alt={image._id}
               width={400}
               height={300}
+              priority
               className="rounded-lg object-cover w-full h-full"
             />
           </div>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[800px] p-0">
-          <div className="relative">
-            <Image
-              src={image.url}
-              alt={image._id}
-              width={800}
-              height={800}
-              className="rounded-lg object-contain w-full h-full"
-            />
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute top-2 right-2 p-1 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
-            >
-              <X className="w-6 h-6" />
-            </button>
-            <div className="absolute bottom-2 left-2">
-              <Button variant="outline" asChild>
-                <Link href={`/view-hunt/${image.huntId}`}>View</Link>
-              </Button>
+          <DialogTitle>
+            <div className="relative">
+              <Image
+                src={image.url}
+                alt={image._id}
+                width={800}
+                height={800}
+                className="rounded-lg object-contain w-full h-full"
+              />
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute top-2 right-2 p-1 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <div className="absolute bottom-2 left-2">
+                <Button variant="outline" asChild>
+                  <Link href={`/view-hunt/${image.huntId}`}>View</Link>
+                </Button>
+              </div>
             </div>
-          </div>
+          </DialogTitle>
         </DialogContent>
       </Dialog>
       {image.isFavorite ? (

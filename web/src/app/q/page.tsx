@@ -34,7 +34,7 @@ import { History, MapPin } from "lucide-react";
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { CalendarForm } from "../log/date-picker";
+import { CalendarForm } from "../../components/date-picker";
 import { BlindSessions } from "./BlindSessions";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -100,7 +100,6 @@ const HuntEntryForm = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("Form data:", form.getValues());
     if (!user) {
       alert("Please login to save your hunt");
       return;

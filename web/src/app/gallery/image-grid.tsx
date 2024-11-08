@@ -9,7 +9,7 @@ export function ImageGrid({
   getImage,
 }: {
   images: any[];
-  getImage: (imageData: any) => ReactNode;
+  getImage: (imageData: any, index: number) => ReactNode;
 }) {
   function getColumns(colIndex: number) {
     return images.filter((resource, idx) => idx % MAX_COLUMNS === colIndex);
@@ -20,7 +20,7 @@ export function ImageGrid({
       {[getColumns(0), getColumns(1), getColumns(2), getColumns(3)].map(
         (column, idx) => (
           <div key={idx} className="flex flex-col gap-4">
-            {column.map(getImage)}
+            {column.map((image, index) => getImage(image, index))}
           </div>
         )
       )}

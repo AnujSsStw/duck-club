@@ -90,14 +90,14 @@ export function DataTableToolbar<TData>({
         <Input
           placeholder={`Filter ${selectedColumn ?? "column"}...`}
           value={
-            (table
-              .getColumn(selectedColumn ?? "")
-              ?.getFilterValue() as string) ?? ""
+            selectedColumn
+              ? (table.getColumn(selectedColumn)?.getFilterValue() as string) ??
+                ""
+              : ""
           }
           onChange={(event) =>
-            table
-              .getColumn(selectedColumn ?? "")
-              ?.setFilterValue(event.target.value)
+            selectedColumn &&
+            table.getColumn(selectedColumn)?.setFilterValue(event.target.value)
           }
           className="max-w-sm ml-4"
           disabled={!selectedColumn}

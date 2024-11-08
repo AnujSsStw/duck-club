@@ -10,8 +10,6 @@ export default async function Page({
   params: { _id: string };
 }) {
   const sessionId = (await searchParams).session as string;
-  console.log("sessionId", sessionId);
-  console.log("params", params);
 
   if (sessionId && params._id) {
     return (

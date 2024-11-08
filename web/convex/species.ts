@@ -1,4 +1,4 @@
-import { query } from "../_generated/server";
+import { query } from "./_generated/server";
 
 export const getWaterfowlSpecies = query({
   handler: async (ctx) => {

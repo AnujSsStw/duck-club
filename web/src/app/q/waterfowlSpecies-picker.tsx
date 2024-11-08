@@ -29,7 +29,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { Plus, Trash2 } from "lucide-react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { api } from "../../../../../convex/_generated/api";
+import { api } from "../../../convex/_generated/api";
 
 export function HarvestSpeciesPicker({
   nestIndex,
@@ -38,7 +38,7 @@ export function HarvestSpeciesPicker({
   form: UseFormReturn<HuntFormValues>;
   nestIndex: number;
 }) {
-  const species = useQuery(api.queries.species.getWaterfowlSpecies);
+  const species = useQuery(api.species.getWaterfowlSpecies);
 
   const { fields, append, remove, update } = useFieldArray({
     control: form.control,

@@ -13,8 +13,8 @@ import { cn } from "@/lib/utils";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "My App Title",
-  description: "My app description",
+  title: "Kill Book",
+  description: "A place to store your hunting data",
 };
 
 export default function RootLayout({

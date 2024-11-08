@@ -13,7 +13,9 @@ export default function Page() {
     <div>
       <ImageGrid
         images={images}
-        getImage={(image) => <ImageComponent image={image} />}
+        getImage={(image, index) => (
+          <ImageComponent key={image._id || index} image={image} />
+        )}
       />
     </div>
   );

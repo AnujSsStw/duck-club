@@ -3,7 +3,6 @@ import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { WebhookEvent } from "@clerk/backend";
 import { Webhook } from "svix";
-import { getData } from "./queries/data";
 import { getHuntDetails } from "./huntsAllData";
 
 const http = httpRouter();
@@ -70,7 +69,6 @@ http.route({
   method: "GET",
   handler: httpAction(async (ctx, request) => {
     const q = request.url.split("/").pop() as string;
-    console.log("Query", q);
 
     if (!q) {
       return new Response(JSON.stringify([]), {
@@ -88,12 +86,6 @@ http.route({
       },
     });
   }),
-});
-
-http.route({
-  path: "/data",
-  method: "GET",
-  handler: getData,
 });
 
 http.route({

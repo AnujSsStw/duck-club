@@ -45,10 +45,8 @@ export function SignInAndSignUpButtons() {
 
 function SignedInContent() {
   const user = useQuery(api.users.current);
-  const hunts = useQuery(api.huntsAllData.getHuntsByCreator, {
-    creatorId: user?._id,
-  });
-  if (!hunts) return <Loading />;
+
+  if (!user) return <Loading />;
 
   return (
     <>

@@ -8,12 +8,12 @@ import { Loader2, Search, UserPlus, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { useDebounce } from "use-debounce";
-import { Id } from "../../../../../convex/_generated/dataModel";
+import { Id } from "../../../convex/_generated/dataModel";
 import { BlindsManager } from "./blinds-picker";
 
 import { GuestHunter } from "./guest-hunter";
 import { z } from "zod";
-import { HuntFormSchema } from "@/app/q/page";
+import { HuntFormSchema } from "./hunt-form-schema";
 
 type Hunter = {
   _id: Id<"hunters">;

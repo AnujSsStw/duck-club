@@ -11,8 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
-import { HunterSelect } from "../log/[hunt]/[sub-hunt]/hunter-select";
-import { HarvestSpeciesPicker } from "../log/[hunt]/[sub-hunt]/waterfowlSpecies-picker";
+import { HunterSelect } from "./hunter-select";
+import { HarvestSpeciesPicker } from "./waterfowlSpecies-picker";
 import { Blind } from "./blind";
 import { HuntFormValues } from "./hunt-form-schema";
 

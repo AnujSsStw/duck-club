@@ -2,11 +2,7 @@
 import { useQuery } from "convex/react";
 import { DataTable } from "./data-table";
 import { api } from "../../../convex/_generated/api";
-import {
-  getHuntsAllDataColumns,
-  flattenHuntsData,
-  flattenHuntsData2,
-} from "./columns";
+import { getHuntsAllDataColumns, flattenHuntsData } from "./columns";
 import { Loading } from "@/components/loading";
 
 export default function Page() {
@@ -14,15 +10,12 @@ export default function Page() {
   const dataViewData = useQuery(api.data_view.get, {
     hunterId: currentUser?._id,
   });
-  console.log(dataViewData);
 
   const columns = getHuntsAllDataColumns();
 
   if (!currentUser || !dataViewData) return <Loading />;
 
-  const flattenedData = flattenHuntsData2(dataViewData);
-
-  console.log(flattenedData);
+  const flattenedData = flattenHuntsData(dataViewData);
 
   return (
     <div className="p-4">
