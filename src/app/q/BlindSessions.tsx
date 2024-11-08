@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Plus, Trash2 } from "lucide-react";
-import { useFieldArray, UseFormReturn } from "react-hook-form";
 import { HunterSelect } from "./hunter-select";
 import { HarvestSpeciesPicker } from "./waterfowlSpecies-picker";
 import { Blind } from "./blind";
 import { HuntFormValues } from "./hunt-form-schema";
+import { UseFormReturn, useFieldArray } from "react-hook-form";
 
 export function BlindSessions({
   form,

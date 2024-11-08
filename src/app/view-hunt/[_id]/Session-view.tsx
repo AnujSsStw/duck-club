@@ -6,7 +6,7 @@ import { useQuery } from "convex/react";
 import { Bird, Camera, CloudSun, MapPin, Users } from "lucide-react";
 import { Loading } from "@/components/loading";
 import { api } from "../../../../convex/_generated/api";
-import { Id } from "../../../../convex/_generated/dataModel";
+import { Doc, Id } from "../../../../convex/_generated/dataModel";
 
 type SessionViewProps = {
   sessionId: Id<"blindSessions">;
@@ -42,8 +42,10 @@ export function SessionView({ sessionId, huntId }: SessionViewProps) {
         <BlindCard
           blindInfo={blindInfo}
           location={location}
-          hunters={hunters}
-          harvests={harvests}
+          hunters={hunters.filter((h): h is Doc<"hunters"> => h !== null)}
+          harvests={harvests.filter(
+            (h): h is Doc<"waterfowlSpecies"> => h !== null
+          )}
         />
 
         {blindInfo.notes && (
@@ -57,23 +59,17 @@ export function SessionView({ sessionId, huntId }: SessionViewProps) {
           </Card>
         )}
 
-        {photos && photos.length > 0 && <PicturesCard photos={photos} />}
+        {photos && photos.length > 0 && (
+          <PicturesCard
+            photos={photos.filter((p): p is string => p !== null)}
+          />
+        )}
       </div>
     </div>
   );
 }
 
-type WeatherCardProps = {
-  weather: {
-    temperatureC: number;
-    windDirection: string;
-    windSpeed: number;
-    visibility: number;
-    condition: string;
-  };
-};
-
-function WeatherCard({ weather }: WeatherCardProps) {
+function WeatherCard({ weather }: { weather: Doc<"weatherConditions"> }) {
   const temperatureF = Math.round((weather.temperatureC * 9) / 5 + 32);
 
   return (
@@ -114,13 +110,8 @@ type BlindCardProps = {
     harvests: Array<{ speciesId: string; quantity: number }>;
   };
   location: { description: string };
-  hunters: Array<{
-    _id: string;
-    fullName: string;
-    pictureUrl?: string;
-    memberShipType: string;
-  }>;
-  harvests: Array<{ _id: string; name: string }>;
+  hunters: Array<Doc<"hunters">>;
+  harvests: Array<Doc<"waterfowlSpecies">>;
 };
 
 function BlindCard({ blindInfo, location, hunters, harvests }: BlindCardProps) {

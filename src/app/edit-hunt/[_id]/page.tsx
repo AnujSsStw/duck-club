@@ -1,19 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { Id } from "../../../../convex/_generated/dataModel";
-import { SessionEdit } from "./Edit-session";
-
-async function getHuntDetails(huntId: Id<"huntingSessions">, token: string) {
-  const response = await fetch(
-    `https://gallant-ant-192.convex.site/hunt-details`,
-    {
-      headers: {
-        huntId: huntId,
-        Authorization: token,
-      },
-    }
-  );
-  return response.json();
-}
+// import { SessionEdit } from "./Edit-session";
 
 export default async function Page({
   params,
@@ -24,11 +11,5 @@ export default async function Page({
 
   if (!userId) return null;
 
-  const huntDetails = await getHuntDetails(params._id, userId);
-
-  return (
-    <div>
-      <SessionEdit huntId={params._id} huntDetails={huntDetails} />
-    </div>
-  );
+  return <div>{/* <SessionEdit huntId={params._id} /> */}</div>;
 }
